@@ -2,6 +2,8 @@
 MiniMax Player
 """
 from players.AbstractPlayer import AbstractPlayer
+import SearchAlgos
+import time
 #TODO: you can import more modules, if needed
 
 
@@ -21,7 +23,14 @@ class Player(AbstractPlayer):
         No output is expected.
         """
         #TODO: erase the following line and implement this function.
-        raise NotImplementedError
+        self.board = board
+        for i in range(board.len):
+            for j in range(board[0].len):
+                if board[i][j] == 1:
+                    self_pos = (i,j)
+                if board[i][j] == 2:
+                    enemy_pos = (i,j)
+
 
     def make_move(self, time_limit, players_score):
         """Make move with this Player.
@@ -31,8 +40,13 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        raise NotImplementedError
-
+        start_time = time.time()
+        minimax_ret = 0
+        counter = 1
+        while(time.time() - start_time < time_limit):
+            minimax_ret = MiniMax.search(self.board, counter, True)
+            counter += 1
+        return minimax_ret
 
     def set_rival_move(self, pos):
         """Update your info, given the new position of the rival.
