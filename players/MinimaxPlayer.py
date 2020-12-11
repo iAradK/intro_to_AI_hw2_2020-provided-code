@@ -9,7 +9,8 @@ class Player(AbstractPlayer):
     def __init__(self, game_time, penalty_score):
         AbstractPlayer.__init__(self, game_time, penalty_score) # keep the inheritance of the parent's (AbstractPlayer) __init__()
         #TODO: initialize more fields, if needed, and the Minimax algorithm from SearchAlgos.py
-
+        self.game_time = game_time
+        self.penalty_score = penalty_score
 
     def set_game_params(self, board):
         """Set the game parameters needed for this player.
@@ -40,7 +41,9 @@ class Player(AbstractPlayer):
         No output is expected
         """
         #TODO: erase the following line and implement this function.
-        raise NotImplementedError
+        self.board[self.enemy_pos[0]][self.enemy_pos[1]] = -1
+        self.board[pos[0]][pos[1]] = 2
+        self.enemy_pos = pos
 
 
     def update_fruits(self, fruits_on_board_dict):
@@ -52,8 +55,14 @@ class Player(AbstractPlayer):
         No output is expected.
         """
         #TODO: erase the following line and implement this function. In case you choose not to use it, use 'pass' instead of the following line.
-        raise NotImplementedError
+        new_fruit_positions = fruits_on_board_dict.keys()
+        for pos in self.cur_fruits.keys(): #Remove old fruits
+            if pos not in new_fruit_positions:
+                self.board[pos[0]][pos[1]] = 0
 
+        for pos, val in fruits_on_board_dict: #Update new fruits
+            if self.board[pos[0]][pos[1]] not in [-1,1,2]:
+                self.board[pos[0]][pos[1]] = val
 
     ########## helper functions in class ##########
     #TODO: add here helper functions in class, if needed
