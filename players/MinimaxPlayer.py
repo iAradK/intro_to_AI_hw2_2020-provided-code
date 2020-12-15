@@ -84,3 +84,14 @@ class Player(AbstractPlayer):
 
     ########## helper functions for MiniMax algorithm ##########
     #TODO: add here the utility, succ, and perform_move functions used in MiniMax algorithm
+
+
+
+    def func(attempts):
+        if attempts <= 3:
+            return 0
+        attempts -= 3
+        sum = 2
+        while attempts > 0:
+            attempts -= 1
+            sum += sum**2
