@@ -2,7 +2,7 @@
 """
 import collections
 
-from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT
+from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 
 from players.our_structurs import State
 
@@ -28,9 +28,10 @@ def can_I_move(board, location):
             can_move = True
     return can_move
 
-
+"""
 def perform_move(state, move):
     #TODO: given a state and a move, returns the new state after the move
+"""
 
 def calc_dist(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
