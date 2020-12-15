@@ -4,8 +4,19 @@ from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT
 
 from players.our_structurs import State
 
-def calc_score():
-    return
+
+def calc_score(state, new_pos, player_type):
+    board_pos = state.board[new_pos[0]][new_pos[1]]
+    added_score = 0
+    if board_pos > 2:
+        added_score += board_pos
+    temp_board = state.board
+    if not can_I_move(state.board, new_pos):
+        added_score -= state.fine_score
+    if player_type == 1:
+        return state.my_score + added_score
+    return  state.rival_score + added_score
+
 
 def can_I_move(board, location):
     can_move = False
@@ -15,8 +26,10 @@ def can_I_move(board, location):
             can_move = True
     return can_move
 
+
 def calc_dist(pos1, pos2):
     return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+
 
 def heuristic_calc(state):
     best_pos = (0, 0)
