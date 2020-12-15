@@ -89,8 +89,6 @@ class Player(AbstractPlayer):
     ########## helper functions for MiniMax algorithm ##########
     #TODO: add here the utility, succ, and perform_move functions used in MiniMax algorithm
 
-
-
     def func(attempts):
         if attempts <= 3:
             return 0
