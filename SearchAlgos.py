@@ -32,6 +32,8 @@ def can_I_move(board, location):
 def perform_move(state, move):
     #TODO: given a state and a move, returns the new state after the move
 
+def calc_dist(pos1, pos2):
+    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
 def succ(board, close, cur_pos, depth):
     states = set()
@@ -72,6 +74,20 @@ def heuristic_calc(state):
             best_hueristic = value + 500 - 100*dist
             best_pos = pos
 
+def get_legal_moves(board, location):
+    legal_moves = []
+    for d in get_directions():
+        i = location[0] + d[0]
+        j = location[1] + d[1]
+
+        # check legal move
+        if 0 <= i < len(board) and 0 <= j < len(board[0]) and (board[i][j] not in [-1, 1, 2]):
+            legal_moves.append((i, j))
+    return legal_moves
+
+def calc_direction(old_loc, new_loc):
+    return (new_loc[0]-old_loc[0], new_loc[1]-old_loc[1])
+
 
 class SearchAlgos:
     def __init__(self, utility, succ, perform_move, goal=None):
@@ -100,11 +116,46 @@ class MiniMax(SearchAlgos):
         :return: A tuple: (The min max algorithm value, The direction in case of max node or None in min mode)
         """
         #TODO: erase the following line and implement this function.
-        if can_I_move == False: #is goal state
+        if maximizing_player is True: # my turn
+            location = state.my_location
+        else:
+            location = state.rival_location
+        if can_I_move(state.board, location) is False or depth == 0: #is goal state or at end of depth
             return calc_score()
 
-
-
+        if maximizing_player is True:
+            max_val = -1000000
+            best_direction = None
+            for child in get_legal_moves(state.board, location):
+                fruits = state.fruits
+                if state.board[child[0]][child[1]] > 2: #if we are on a fruit
+                    del fruits[child]
+                tmp_board = state.board
+                tmp_board[state.my_location[0]][state.my_location[1]] = -1 # Update old location
+                tmp_board[child[0]][child[1]] = 1 # Update new location
+                my_score = calc_score(state, child, 1)
+                new_state = State(tmp_board, state.fine_score, my_score, state.rival_score, fruits)
+                (val, _) = self.search(new_state, depth-1, False)
+                if max_val < val:
+                    best_direction = calc_direction(location, child)
+                    max_val = val
+            return (max_val, best_direction)
+        else:
+            min_val = 1000000
+            best_direction = None
+            for child in get_legal_moves(state.board, location):
+                fruits = state.fruits
+                if state.board[child[0]][child[1]] > 2: #if we are on a fruit
+                    del fruits[child]
+                tmp_board = state.board
+                tmp_board[state.my_location[0]][state.my_location[1]] = -1 # Update old location
+                tmp_board[child[0]][child[1]] = 2 # Update new location
+                new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score, fruits)
+                (val, _) = self.search(new_state, depth-1, False)
+                if min_val < val:
+                    best_direction = calc_direction(location, child)
+                    min = val
+            return (min, best_direction)
 
 class AlphaBeta(SearchAlgos):
 

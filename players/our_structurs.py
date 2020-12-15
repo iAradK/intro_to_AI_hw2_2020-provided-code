@@ -8,6 +8,8 @@ class State:
         self.my_score = my_score
         self.rival_score = rival_score
         self.fruits = fruits
+        self.my_location = None
+        self.rival_location = None
         for i in len(board):
             for j in len(board[i]):
                 if board[i][j] == 1:
