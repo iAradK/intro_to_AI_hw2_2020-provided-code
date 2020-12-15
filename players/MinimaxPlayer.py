@@ -57,6 +57,9 @@ class Player(AbstractPlayer):
             # print('depth        ', depth)
             iteration_time = time.time() - start_iteration
             depth += 1
+        new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
+        self.board[state.my_location[0]][state.my_location[1]] = -1
+        self.board[new_pos[0]][new_pos[1]] = 1
         return minimax_ret[1]
 
     def set_rival_move(self, pos):

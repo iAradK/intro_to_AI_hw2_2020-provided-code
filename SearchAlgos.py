@@ -136,6 +136,8 @@ class MiniMax(SearchAlgos):
             location = state.my_location
         else:
             location = state.rival_location
+        if location is None:
+            print(state.board)
         if can_I_move(state.board, location) is False or depth == 0:  # is goal state or at end of depth
             return (calc_score(state, location, 1), None)
 
@@ -146,18 +148,18 @@ class MiniMax(SearchAlgos):
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
                     del fruits[child]
-                print('######################')
-                print(state.board)
-                print(state.my_location)
+                # print('######################')
+                # print(state.board)
+                # print(state.my_location)
                 tmp_board = state.board.copy()
                 tmp_board[state.my_location[0]][state.my_location[1]] = -1  # Update old location
                 tmp_board[child[0]][child[1]] = 1  # Update new location
                 my_score = calc_score(state, child, 1)
-                print('######################')
-                print(tmp_board)
+                # print('######################')
+                # print(tmp_board)
                 new_state = State(tmp_board, state.fine_score, my_score, state.rival_score, fruits)
-                print(new_state.my_location)
-                print(can_I_move(state.board, new_state.my_location), depth, '++++++++++++++++++++++++++++++')
+                # print(new_state.my_location)
+                # print(can_I_move(state.board, new_state.my_location), depth, '++++++++++++++++++++++++++++++')
                 (val, _) = self.search(new_state, depth - 1, False)
                 if max_val < val:
                     best_direction = calc_direction(location, child)
@@ -171,7 +173,7 @@ class MiniMax(SearchAlgos):
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
                     del fruits[child]
                 tmp_board = state.board.copy()
-                print(state.board)
+                # print(state.board)
                 tmp_board[state.rival_location[0]][state.rival_location[1]] = -1  # Update old location
                 tmp_board[child[0]][child[1]] = 2  # Update new location
                 new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score, fruits)
