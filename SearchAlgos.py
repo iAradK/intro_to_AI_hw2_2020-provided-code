@@ -1,5 +1,7 @@
 """Search Algos: MiniMax, AlphaBeta
 """
+import collections
+
 from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT
 
 from players.our_structurs import State
@@ -27,9 +29,32 @@ def can_I_move(board, location):
     return can_move
 
 
-def calc_dist(pos1, pos2):
-    return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
+def perform_move(state, move):
+    #TODO: given a state and a move, returns the new state after the move
 
+
+def succ(board, close, cur_pos, depth):
+    states = set()
+    for move in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
+        new_pos = (cur_pos[0] + move[0], cur_pos[1], move[1])
+        if board[new_pos[0]][new_pos[1]] in [1, 2, -1] or new_pos in close:
+            continue
+        states.add((new_pos, depth+1))
+    return states
+
+def find_fruits(state):
+    close, open = set(), collections.deque([(state.self_pos,0)])
+    close.add(state.self_pos)
+    fruits = {}
+    while open:
+        cur = open.popleft()
+        close.add(cur[0])
+        if cur[1] == 6:
+            continue
+        for next in succ(state.board, close, cur[0], cur[1]):
+            if state.board[next[0][0]][next[0][1]] > 2:
+                fruits[next[0]] = next[1]
+            open.append(next)
 
 def heuristic_calc(state):
     best_pos = (0, 0)
