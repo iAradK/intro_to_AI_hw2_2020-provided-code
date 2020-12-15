@@ -2,6 +2,7 @@
 """
 from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT
 
+from players.our_structurs import State
 
 def calc_score():
     return
@@ -53,7 +54,7 @@ class SearchAlgos:
 
 
 class MiniMax(SearchAlgos):
-    def search(self, state, depth, maximizing_player):
+    def search(self, state: State, depth, maximizing_player):
         """Start the MiniMax algorithm.
         :param state: The state to start from.
         :param depth: The maximum allowed depth for the algorithm.
@@ -63,6 +64,7 @@ class MiniMax(SearchAlgos):
         #TODO: erase the following line and implement this function.
         if can_I_move == False: #is goal state
             return calc_score()
+
 
 
 
