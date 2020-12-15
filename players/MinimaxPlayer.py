@@ -2,7 +2,7 @@
 MiniMax Player
 """
 from players.AbstractPlayer import AbstractPlayer
-import SearchAlgos
+from SearchAlgos import MiniMax
 import time
 #TODO: you can import more modules, if needed
 
@@ -42,11 +42,15 @@ class Player(AbstractPlayer):
         #TODO: erase the following line and implement this function.
         start_time = time.time()
         minimax_ret = 0
-        counter = 1
-        while(time.time() - start_time < time_limit):
-            minimax_ret = MiniMax.search(self.board, counter, True)
-            counter += 1
-        return minimax_ret
+        iteration_time = 0
+        depth = 1
+        #TODO: check if correct upperbound
+        while 4*iteration_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
+            start_iteration = time.time()
+            minimax_ret = MiniMax.search(self.board, depth, True)
+            iteration_time = time.time() - start_iteration
+            depth += 1
+        return minimax_ret[1]
 
     def set_rival_move(self, pos):
         """Update your info, given the new position of the rival.
