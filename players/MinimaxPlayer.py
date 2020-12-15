@@ -26,13 +26,14 @@ class Player(AbstractPlayer):
         No output is expected.
         """
         #TODO: erase the following line and implement this function.
+        self.cur_fruits = None
         self.board = board
-        for i in range(board.len):
-            for j in range(board[0].len):
+        for i in range(len(board)):
+            for j in range(len(board[0])):
                 if board[i][j] == 1:
-                    self_pos = (i,j)
+                    self.self_pos = (i,j)
                 if board[i][j] == 2:
-                    enemy_pos = (i,j)
+                    self.enemy_pos = (i,j)
 
 
     def make_move(self, time_limit, players_score):
@@ -43,14 +44,17 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
+        time_limit = 1
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
+        state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits)
         #TODO: check if correct upperbound
         while 4*iteration_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
             start_iteration = time.time()
-            minimax_ret = MiniMax.search(self.board, depth, True)
+            minimax_ret = MiniMax(None, None, None).search(state=state, depth=depth, maximizing_player=True)
+            # print('depth        ', depth)
             iteration_time = time.time() - start_iteration
             depth += 1
         return minimax_ret[1]
@@ -77,14 +81,15 @@ class Player(AbstractPlayer):
         """
         #TODO: erase the following line and implement this function. In case you choose not to use it, use 'pass' instead of the following line.
         new_fruit_positions = fruits_on_board_dict.keys()
-        for pos in self.cur_fruits.keys(): #Remove old fruits
-            if pos not in new_fruit_positions:
-                self.board[pos[0]][pos[1]] = 0
+        if self.cur_fruits is not None:
+            for pos in self.cur_fruits.keys(): #Remove old fruits
+                if pos not in new_fruit_positions:
+                    self.board[pos[0]][pos[1]] = 0
 
-        for pos, val in fruits_on_board_dict: #Update new fruits
-            if self.board[pos[0]][pos[1]] not in [-1,1,2]:
+        for pos, val in fruits_on_board_dict.items(): #Update new fruits
+            if self.board[pos[0]][pos[1]] not in [-1, 1, 2]:
                 self.board[pos[0]][pos[1]] = val
-
+        self.cur_fruits = fruits_on_board_dict
     ########## helper functions in class ##########
     #TODO: add here helper functions in class, if needed
 

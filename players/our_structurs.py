@@ -10,9 +10,9 @@ class State:
         self.fruits = fruits
         self.my_location = None
         self.rival_location = None
-        for i in len(board):
-            for j in len(board[i]):
+        for i in range(len(board)):
+            for j in range(len(board[i])):
                 if board[i][j] == 1:
-                    self.my_location == board[i][j]
+                    self.my_location = (i, j)
                 if board[i][j] == 2:
-                    self.rival_location == board[i][j]
+                    self.rival_location = (i, j)
