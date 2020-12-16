@@ -16,8 +16,8 @@ def calc_score(state, new_pos, player_type):
     if not can_I_move(state.board, new_pos):
         added_score -= state.fine_score
     if player_type == 1:
-        return state.my_score + added_score
-    return state.rival_score + added_score
+        return state.my_score + added_score - state.rival_score
+    return state.rival_score + added_score - state.my_score
 
 
 def can_I_move(board, pos):
