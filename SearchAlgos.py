@@ -141,7 +141,7 @@ class MiniMax(SearchAlgos):
             print("WTF?!?!", state.board)
             exit()
         if can_I_move(state.board, location) is False or depth == 0:  # is goal state or at end of depth
-            return (calc_score(state, location, 1), None)
+            return (calc_score(state, 1), None)
 
         if maximizing_player is True:
             max_val = -1000000
