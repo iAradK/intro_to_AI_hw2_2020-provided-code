@@ -48,17 +48,20 @@ def calc_dist(pos1, pos2):
 
 def succ(board, close, cur_pos, depth):
     states = set()
+    if cur_pos is None:
+        print('hi')
     for move in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
-        new_pos = (cur_pos[0] + move[0], cur_pos[1], move[1])
-        if board[new_pos[0]][new_pos[1]] in [1, 2, -1] or new_pos in close:
+        new_pos = (cur_pos[0] + move[0], cur_pos[1] + move[1])
+        if not (0 <= new_pos[0] < len(board) and 0 <= new_pos[1] < len(board[0])) \
+                or board[new_pos[0]][new_pos[1]] in [1, 2, -1] or new_pos in close:
             continue
         states.add((new_pos, depth + 1))
     return states
 
 
 def find_fruits(state):
-    close, open = set(), collections.deque([(state.self_pos, 0)])
-    close.add(state.self_pos)
+    close, open = set(), collections.deque([(state.my_location, 0)])
+    close.add(state.my_location)
     fruits = {}
     while open:
         cur = open.popleft()
@@ -132,6 +135,7 @@ class MiniMax(SearchAlgos):
         :return: A tuple: (The min max algorithm value, The direction in case of max node or None in min mode)
         """
         # TODO: erase the following line and implement this function.
+        find_fruits(state)
         if maximizing_player is True:  # my turn
             location = state.my_location
         else:

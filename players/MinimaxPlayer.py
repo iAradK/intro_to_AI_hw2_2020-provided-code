@@ -44,17 +44,17 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        time_limit = 1
+        time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits)
         #TODO: check if correct upperbound
-        while 4*iteration_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
+        while 4*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
             start_iteration = time.time()
             minimax_ret = MiniMax(None, None, None).search(state=state, depth=depth, maximizing_player=True)
-            # print('depth        ', depth)
+            print('depth        ', depth)
             iteration_time = time.time() - start_iteration
             depth += 1
         new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
