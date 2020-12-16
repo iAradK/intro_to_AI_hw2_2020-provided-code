@@ -8,10 +8,9 @@ from players.our_structurs import State
 
 
 def calc_score(state, player_type):
-    if player_type == 1:
-        if not can_I_move(state.board, state.my_location):
+    if not can_I_move(state.board, state.my_location):
             state.my_score -= state.fine_score
-    elif not can_I_move(state.board, state.rival_location):
+    if not can_I_move(state.board, state.rival_location):
         state.rival_score -= state.fine_score
     return state.my_score - state.rival_score
 
@@ -150,7 +149,7 @@ class MiniMax(SearchAlgos):
             return (calc_score(state, 1), None)
 
         fruit_vanish = min(len(state.board), len(state.board[0]))
-        if state.turn+1==fruit_vanish:
+        if state.turn==fruit_vanish:
             remove_fruits_from_board(state.board)
         if maximizing_player is True:
             max_val = -1000000

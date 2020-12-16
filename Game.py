@@ -167,10 +167,16 @@ class Game:
     def create_fruits(self):
         num_free_places = len(np.where(self.map == 0)[0])
         if num_free_places != 0:
-            num_fruits = random.randint(0, int(num_free_places * self.fruits_max_part_of_free_spaces))
+            # original code here:
+            # num_fruits = random.randint(0, int(num_free_places * self.fruits_max_part_of_free_spaces))
+            num_fruits = 2 #to remove
             # add new fruits in free spaces (not occupied by players, fruits, blocked cells)
-            for _ in range(num_fruits):
-                pos = self.choose_fruit_pos() # don't cover the players, existing fruits and blocked cells
+            for i in range(num_fruits):
+                #pos = self.choose_fruit_pos() # don't cover the players, existing fruits and blocked cells
+                if i == 0: # to remove
+                    pos = (1,1)
+                if i == 1:
+                    pos = (0,3)
                 if pos != -1:
                     self.add_fruit(pos)
 
