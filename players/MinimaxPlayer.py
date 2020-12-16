@@ -44,7 +44,7 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        time_limit = 5
+        time_limit = 1
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
