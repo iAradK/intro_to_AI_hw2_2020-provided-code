@@ -7,17 +7,13 @@ from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 from players.our_structurs import State
 
 
-def calc_score(state, new_pos, player_type):
-    board_pos = state.board[new_pos[0]][new_pos[1]]
-    added_score = 0
-    if board_pos > 2:
-        added_score += board_pos
-    temp_board = state.board
-    if not can_I_move(state.board, new_pos):
-        added_score -= state.fine_score
+def calc_score(state, player_type):
     if player_type == 1:
-        return state.my_score + added_score - state.rival_score
-    return state.my_score - (state.rival_score + added_score)
+        if not can_I_move(state.board, state.my_location):
+            state.my_score -= state.fine_score
+    elif not can_I_move(state.board, state.rival_location):
+        state.rival_score -= state.fine_score
+    return state.my_score - state.rival_score
 
 
 def can_I_move(board, pos):
