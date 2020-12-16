@@ -50,6 +50,7 @@ def succ(board, close, cur_pos, depth):
     states = set()
     if cur_pos is None:
         print('hi')
+        print("\n\nBoard = ", board, "\n\n")
     for move in [(1, 0), (0, 1), (-1, 0), (0, -1)]:
         new_pos = (cur_pos[0] + move[0], cur_pos[1] + move[1])
         if not (0 <= new_pos[0] < len(board) and 0 <= new_pos[1] < len(board[0])) \
