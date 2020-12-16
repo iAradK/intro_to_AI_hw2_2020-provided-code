@@ -44,7 +44,7 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        time_limit = 1
+        time_limit = 3
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
@@ -57,6 +57,7 @@ class Player(AbstractPlayer):
             print('depth        ', depth)
             iteration_time = time.time() - start_iteration
             depth += 1
+        
         new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
