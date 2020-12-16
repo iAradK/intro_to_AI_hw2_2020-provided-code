@@ -100,6 +100,12 @@ def get_legal_moves(board, location):
             legal_moves.append((i, j))
     return legal_moves
 
+def remove_fruits_from_board(board):
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] > 2:
+                board[i][j] = 0
+
 
 def calc_direction(old_loc, new_loc):
     return (new_loc[0] - old_loc[0], new_loc[1] - old_loc[1])
@@ -143,6 +149,9 @@ class MiniMax(SearchAlgos):
         if can_I_move(state.board, location) is False or depth == 0:  # is goal state or at end of depth
             return (calc_score(state, 1), None)
 
+        fruit_vanish = min(len(state.board), len(state.board[0]))
+        if state.turn+1==fruit_vanish:
+            remove_fruits_from_board(state.board)
         if maximizing_player is True:
             max_val = -1000000
             best_direction = None
@@ -155,7 +164,8 @@ class MiniMax(SearchAlgos):
                 tmp_board = state.board.copy()
                 tmp_board[state.my_location[0]][state.my_location[1]] = -1  # Update old location
                 tmp_board[child[0]][child[1]] = 1  # Update new location
-                new_state = State(tmp_board, state.fine_score, state.my_score+score_to_add, state.rival_score, fruits)
+                new_state = State(tmp_board, state.fine_score, state.my_score+score_to_add, state.rival_score,
+                                  fruits, state.turn+1)
                 (val, _) = self.search(new_state, depth - 1, False)
                 if max_val < val:
                     best_direction = calc_direction(location, child)
@@ -173,7 +183,8 @@ class MiniMax(SearchAlgos):
                 tmp_board = state.board.copy()
                 tmp_board[state.rival_location[0]][state.rival_location[1]] = -1  # Update old location
                 tmp_board[child[0]][child[1]] = 2  # Update new location
-                new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score+score_to_add, fruits)
+                new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score+score_to_add,
+                                  fruits, state.turn)
                 (val, _) = self.search(new_state, depth - 1, True)
                 if val < min_val:
                     best_direction = calc_direction(location, child)

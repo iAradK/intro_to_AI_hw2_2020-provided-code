@@ -16,6 +16,7 @@ class Player(AbstractPlayer):
         #TODO: initialize more fields, if needed, and the Minimax algorithm from SearchAlgos.py
         self.game_time = game_time
         self.penalty_score = penalty_score
+        self.turn = 0
 
     def set_game_params(self, board):
         """Set the game parameters needed for this player.
@@ -49,7 +50,7 @@ class Player(AbstractPlayer):
         minimax_ret = 0
         iteration_time = 0
         depth = 1
-        state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits)
+        state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
         #TODO: check if correct upperbound
         while 4*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
             start_iteration = time.time()
@@ -61,7 +62,7 @@ class Player(AbstractPlayer):
         new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
-        #print("my: ", self.board)
+        self.turn += 1
         return minimax_ret[1]
 
     def set_rival_move(self, pos):
