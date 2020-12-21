@@ -3,6 +3,7 @@ MiniMax Player
 """
 from players.AbstractPlayer import AbstractPlayer
 from SearchAlgos import MiniMax
+from SearchAlgos import find_longest_route
 import time
 from players.our_structurs import State
 
@@ -44,14 +45,14 @@ class Player(AbstractPlayer):
         output:
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
-        #TODO: erase the following line and implement this function.
         time_limit = 1
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
-        #TODO: check if correct upperbound
+        print('longest route: ', find_longest_route(state))
+        #TODO: check if correct upperbound and fix limit
         while 4*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
             start_iteration = time.time()
             minimax_ret = MiniMax(None, None, None).search(state=state, depth=depth, maximizing_player=True)
@@ -63,6 +64,7 @@ class Player(AbstractPlayer):
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
         self.turn += 1
+
         return minimax_ret[1]
 
     def set_rival_move(self, pos):

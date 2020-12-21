@@ -9,7 +9,7 @@ from players.our_structurs import State
 
 def calc_score(state, player_type):
     if not can_I_move(state.board, state.my_location):
-            state.my_score -= state.fine_score
+        state.my_score -= state.fine_score
     if not can_I_move(state.board, state.rival_location):
         state.rival_score -= state.fine_score
     return state.my_score - state.rival_score
@@ -71,21 +71,49 @@ def find_fruits(state):
     return fruits
 
 
+def find_longest_route_aux(board, curr_pos, new_pos, depth):
+    temp_board = board.copy()
+    temp_board[curr_pos[0]][curr_pos[1]] = -1
+    if depth == 10:
+        return 0
+    max = 0
+    if not can_I_move(temp_board, new_pos):
+        return 0
+    for d in get_legal_moves(board, new_pos):
+        temp = 1 + find_longest_route_aux(temp_board, new_pos, d, depth + 1)
+        if temp > max:
+            max = temp
+    return max
+
+
+def find_longest_route(state):
+    max = 0
+    for d in get_legal_moves(state.board, state.my_location):
+        temp = find_longest_route_aux(state.board, state.my_location, d, 0)
+        if temp > max:
+            max = temp
+    return max
+
+
 def heuristic_calc(state):
-    best_pos = (0, 0)
-    best_hueristic = -1
-    closest_fruit_score = 0
-    for pos, value in state.fruits.items():
-        dist = calc_dist(state.self_pos, pos)
-        if dist > 5:
+    heuristic = 0
+    fruits = find_fruits(state)
+    fruit_time = min(len(state.board), len(state.board[1])) - state.turn
+    for key, value in fruits.items():
+        if value > fruit_time:
+            del fruits[key]
             continue
-        if best_hueristic == -1:
-            best_pos = pos
-            best_hueristic = value + 500 - 100 * dist
-            continue
-        if value + 500 - 100 * dist > best_hueristic:
-            best_hueristic = value + 500 - 100 * dist
-            best_pos = pos
+        if calc_dist(state.my_location, key) > calc_dist(state.rival_location, key):  # TODO: check if > or >=
+            del fruits[key]
+    max_fruit = -1
+    for key, value in fruits.items():
+        if state.fruits[key] > max_fruit:
+            max_fruit = state.fruits[key]
+    if max_fruit == -1:
+        heuristic += min(find_longest_route(state), 10) * state.fine_score
+    else:
+        heuristic += min(find_longest_route(state), 5) * (state.fine_score / max_fruit)
+        heuristic += max_fruit * (max_fruit / state.fine_score)
 
 
 def get_legal_moves(board, location):
@@ -98,6 +126,7 @@ def get_legal_moves(board, location):
         if 0 <= i < len(board) and 0 <= j < len(board[0]) and (board[i][j] not in [-1, 1, 2]):
             legal_moves.append((i, j))
     return legal_moves
+
 
 def remove_fruits_from_board(board):
     for i in range(len(board)):
@@ -149,7 +178,7 @@ class MiniMax(SearchAlgos):
             return (calc_score(state, 1), None)
 
         fruit_vanish = min(len(state.board), len(state.board[0]))
-        if state.turn==fruit_vanish:
+        if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)
         if maximizing_player is True:
             max_val = -1000000
@@ -163,8 +192,8 @@ class MiniMax(SearchAlgos):
                 tmp_board = state.board.copy()
                 tmp_board[state.my_location[0]][state.my_location[1]] = -1  # Update old location
                 tmp_board[child[0]][child[1]] = 1  # Update new location
-                new_state = State(tmp_board, state.fine_score, state.my_score+score_to_add, state.rival_score,
-                                  fruits, state.turn+1)
+                new_state = State(tmp_board, state.fine_score, state.my_score + score_to_add, state.rival_score,
+                                  fruits, state.turn + 1)
                 (val, _) = self.search(new_state, depth - 1, False)
                 if max_val < val:
                     best_direction = calc_direction(location, child)
@@ -182,7 +211,7 @@ class MiniMax(SearchAlgos):
                 tmp_board = state.board.copy()
                 tmp_board[state.rival_location[0]][state.rival_location[1]] = -1  # Update old location
                 tmp_board[child[0]][child[1]] = 2  # Update new location
-                new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score+score_to_add,
+                new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score + score_to_add,
                                   fruits, state.turn)
                 (val, _) = self.search(new_state, depth - 1, True)
                 if val < min_val:
