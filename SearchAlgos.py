@@ -6,7 +6,6 @@ from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 
 from players.our_structurs import State
 
-
 def calc_score(state, player_type):
     if not can_I_move(state.board, state.my_location):
         state.my_score -= state.fine_score
@@ -138,6 +137,12 @@ def remove_fruits_from_board(board):
 def calc_direction(old_loc, new_loc):
     return (new_loc[0] - old_loc[0], new_loc[1] - old_loc[1])
 
+def can_I_win_with_fine(state: State, maximizing_player):
+    if maximizing_player is True:
+        return state.my_score - state.rival_score > state.fine_score
+
+    return state.rival_score - state.my_score > state.fine_score
+
 
 class SearchAlgos:
     def __init__(self, utility, succ, perform_move, goal=None):
@@ -158,6 +163,10 @@ class SearchAlgos:
 
 
 class MiniMax(SearchAlgos):
+    def just_get_any_legal_location(self, state: State):
+        loc = get_legal_moves(state.board, state.my_location)[0]
+        return calc_direction(state.my_location, loc)
+
     def search(self, state: State, depth, maximizing_player):
         """Start the MiniMax algorithm.
         :param state: The state to start from.
@@ -174,9 +183,14 @@ class MiniMax(SearchAlgos):
         if location is None:
             print("WTF?!?!", state.board)
             exit()
-        if can_I_move(state.board, location) is False or depth == 0:  # is goal state or at end of depth
-            return (calc_score(state, 1), None)
-
+        if can_I_move(state.board, location) is False or depth == 0\
+                or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
+            if can_I_win_with_fine(state, maximizing_player): # We want to make it worth to get the fine
+                if maximizing_player is True:
+                    state.my_score += 10000
+                else:
+                    state.rival_score += 10000
+            return (calc_score(state, 1), (1,1))
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)

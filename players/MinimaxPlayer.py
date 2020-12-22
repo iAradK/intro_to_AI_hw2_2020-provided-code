@@ -45,15 +45,21 @@ class Player(AbstractPlayer):
         output:
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
-        time_limit = 1
+        #TODO: erase the following line and implement this function.
+        time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
-        print('longest route: ', find_longest_route(state))
-        #TODO: check if correct upperbound and fix limit
-        while 4*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
+        if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
+            # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
+            while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
+                ret = MiniMax(None, None, None).just_get_any_legal_location(state)
+            return ret
+
+        #TODO: check if correct upperbound
+        while 5*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
             start_iteration = time.time()
             minimax_ret = MiniMax(None, None, None).search(state=state, depth=depth, maximizing_player=True)
             #print('depth        ', depth)
