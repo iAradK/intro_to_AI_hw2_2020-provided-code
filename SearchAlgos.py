@@ -14,7 +14,7 @@ def preform_move(state:State, dest_location, IsMyTurn) -> State:
     rival_score = state.rival_score
     turn = state.turn
     penalty = state.fine_score
-    fruits = state.fruits
+    fruits = state.fruits.copy()
     if IsMyTurn == True:
         state.turn + 1
         board[my_location[0]][my_location[1]] = -1
@@ -124,6 +124,10 @@ def find_longest_route(state):
     return max
 
 
+def just_get_any_legal_location(state: State):
+    loc = get_legal_moves(state.board, state.my_location)[0]
+    return calc_direction(state.my_location, loc)
+
 def heuristic_calc(state):
     heuristic = 0
     fruits = find_fruits(state)
@@ -175,21 +179,16 @@ def can_I_win_with_fine(state: State, maximizing_player):
 
 def get_heuristic_for_move(state, move, agent):
     value = heuristic_calc(preform_move(state, move, agent))
-    print(value)
     return value
 
 
 def sorted_moves(state, agent):
-    if agent == 0:
+    if agent == 1:
         moves = get_legal_moves(state.board, state.my_location)
     else:
         moves = get_legal_moves(state.board, state.rival_location)
-    print('')
-    print('before sort: ', moves)
     moves.sort(key= (lambda move: get_heuristic_for_move(state, move, agent)))
-    print('after sort: ', moves)
-    print('')
-    return
+    return moves
 
 class SearchAlgos:
     def __init__(self, utility, succ, perform_move, goal=None):
@@ -210,9 +209,7 @@ class SearchAlgos:
 
 
 class MiniMax(SearchAlgos):
-    def just_get_any_legal_location(self, state: State):
-        loc = get_legal_moves(state.board, state.my_location)[0]
-        return calc_direction(state.my_location, loc)
+
 
     def search(self, state: State, depth, maximizing_player):
         """Start the MiniMax algorithm.
@@ -230,7 +227,7 @@ class MiniMax(SearchAlgos):
         if location is None:
             print("WTF?!?!", state.board)
             exit()
-        if can_I_move(state.board, location) is False or depth == 0\
+        if can_I_move(state.board, location) is False \
                 or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
             if can_I_win_with_fine(state, maximizing_player): # We want to make it worth to get the fine
                 if maximizing_player is True:
@@ -238,6 +235,8 @@ class MiniMax(SearchAlgos):
                 else:
                     state.rival_score += 10000
             return (calc_score(state, 1), (1,1))
+        if depth == 0:
+            return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)
@@ -307,14 +306,16 @@ class AlphaBeta(SearchAlgos):
                     state.my_score += 10000
                 else:
                     state.rival_score += 10000
-            return (calc_score(state, 1), (1,1))
+            return (calc_score(state, 1), None)
+        if depth == 0:
+            return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)
         if maximizing_player is True:
             max_val = -1000000
             best_direction = None
-            for child in get_legal_moves(state.board, location):
+            for child in sorted_moves(state, True):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
@@ -333,7 +334,7 @@ class AlphaBeta(SearchAlgos):
         else:
             min_val = 1000000
             best_direction = None
-            for child in get_legal_moves(state.board, location):
+            for child in sorted_moves(state, False):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit

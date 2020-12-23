@@ -2,7 +2,7 @@
 MiniMax Player
 """
 from players.AbstractPlayer import AbstractPlayer
-from SearchAlgos import MiniMax, get_legal_moves, calc_direction
+from SearchAlgos import MiniMax, get_legal_moves, calc_direction, just_get_any_legal_location
 from SearchAlgos import find_longest_route
 import time
 from players.our_structurs import State
@@ -57,7 +57,7 @@ class Player(AbstractPlayer):
         if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
             while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
-                ret = MiniMax(None, None, None).just_get_any_legal_location(state)
+                ret = just_get_any_legal_location(state)
             return ret
 
         #TODO: check if correct upperbound

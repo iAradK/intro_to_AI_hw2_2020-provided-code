@@ -2,7 +2,9 @@
 MiniMax Player with AlphaBeta pruning
 """
 from players.AbstractPlayer import AbstractPlayer
-
+from players.our_structurs import State
+import time
+from SearchAlgos import AlphaBeta, get_legal_moves, calc_direction, just_get_any_legal_location
 
 # TODO: you can import more modules, if needed
 
@@ -12,6 +14,9 @@ class Player(AbstractPlayer):
         AbstractPlayer.__init__(self, game_time,
                                 penalty_score)  # keep the inheritance of the parent's (AbstractPlayer) __init__()
         # TODO: initialize more fields, if needed, and the AlphaBeta algorithm from SearchAlgos.py
+        self.game_time = game_time
+        self.penalty_score = penalty_score
+        self.turn = 0
 
     def set_game_params(self, board):
         """Set the game parameters needed for this player.
@@ -38,7 +43,41 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        raise NotImplementedError
+        time_limit = 2
+        start_time = time.time()
+        minimax_ret = 0
+        iteration_time = 0
+        depth = 1
+
+        state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
+
+        if players_score[0] - players_score[1] > self.penalty_score:  # If it is worthy to end the game
+            # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
+            while time.time() - start_time < time_limit + 8:  # We want to get to fine, end the game and win
+                ret = just_get_any_legal_location(state)
+            return ret
+
+        # TODO: check if correct upperbound
+        while 4 * iteration_time < time_limit and time.time() - start_time < time_limit:  # total time = iter_time + 3*iter_time (the upper bound of the running time)
+            moves = get_legal_moves(state.board, state.my_location)
+            minimax_ret = [1, 2]
+            if len(moves) == 1:
+                minimax_ret[0] = None
+                minimax_ret[1] = calc_direction(state.my_location, moves[0])
+                break
+
+            start_iteration = time.time()
+            minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=depth, maximizing_player=True)
+            # print('depth        ', depth)
+            iteration_time = time.time() - start_iteration
+            depth += 1
+
+        new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
+        self.board[state.my_location[0]][state.my_location[1]] = -1
+        self.board[new_pos[0]][new_pos[1]] = 1
+        self.turn += 1
+
+        return minimax_ret[1]
 
     def set_rival_move(self, pos):
         """Update your info, given the new position of the rival.
