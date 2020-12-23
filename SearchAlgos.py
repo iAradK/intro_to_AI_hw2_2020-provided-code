@@ -128,12 +128,12 @@ def heuristic_calc(state):
     heuristic = 0
     fruits = find_fruits(state)
     fruit_time = min(len(state.board), len(state.board[1])) - state.turn
-    for key, value in fruits.items():
+    for key, value in list(fruits.items()):
         if value > fruit_time:
-            del fruits[key]
+            fruits.pop(key)
             continue
         if calc_dist(state.my_location, key) > calc_dist(state.rival_location, key):  # TODO: check if > or >=
-            del fruits[key]
+            fruits.pop(key)
     max_fruit = -1
     for key, value in fruits.items():
         if state.fruits[key] > max_fruit:
@@ -143,7 +143,7 @@ def heuristic_calc(state):
     else:
         heuristic += min(find_longest_route(state), 5) * (state.fine_score / max_fruit)
         heuristic += max_fruit * (max_fruit / state.fine_score)
-
+    return heuristic
 
 def get_legal_moves(board, location):
     legal_moves = []
@@ -173,6 +173,23 @@ def can_I_win_with_fine(state: State, maximizing_player):
 
     return state.rival_score - state.my_score > state.fine_score
 
+def get_heuristic_for_move(state, move, agent):
+    value = heuristic_calc(preform_move(state, move, agent))
+    print(value)
+    return value
+
+
+def sorted_moves(state, agent):
+    if agent == 0:
+        moves = get_legal_moves(state.board, state.my_location)
+    else:
+        moves = get_legal_moves(state.board, state.rival_location)
+    print('')
+    print('before sort: ', moves)
+    moves.sort(key= (lambda move: get_heuristic_for_move(state, move, agent)))
+    print('after sort: ', moves)
+    print('')
+    return
 
 class SearchAlgos:
     def __init__(self, utility, succ, perform_move, goal=None):
@@ -227,6 +244,7 @@ class MiniMax(SearchAlgos):
         if maximizing_player is True:
             max_val = -1000000
             best_direction = None
+            sorted_moves(state,0)
             for child in get_legal_moves(state.board, location):
                 score_to_add = 0
                 fruits = state.fruits.copy()
