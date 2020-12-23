@@ -17,6 +17,7 @@ def preform_move(state:State, dest_location, IsMyTurn) -> State:
     fruits = state.fruits
     new_state = State()
     if IsMyTurn == True:
+
         state.turn + 1
         board[my_location[0]][my_location[1]] = -1
         my_location = dest_location
