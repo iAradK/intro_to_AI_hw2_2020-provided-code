@@ -6,6 +6,26 @@ from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 
 from players.our_structurs import State
 
+def preform_move(state:State, dest_location, IsMyTurn) -> State:
+    board = state.board.copy()
+    my_location = state.my_location
+    rival_loaction = state.rival_location
+    my_score = state.my_score
+    rival_score = state.rival_score
+    turn = state.turn
+    penalty = state.fine_score
+    fruits = state.fruits
+    new_state = State()
+    if IsMyTurn == True:
+        state.turn + 1
+        board[my_location[0]][my_location[1]] = -1
+        my_location = dest_location
+    else:
+        board[rival_loaction[0]][rival_loaction[1]] = -1
+        rival_loaction = dest_location
+    new_state = State(board, penalty, my_score, rival_score, fruits, turn)
+
+
 def calc_score(state, player_type):
     if not can_I_move(state.board, state.my_location):
         state.my_score -= state.fine_score
