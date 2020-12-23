@@ -15,17 +15,26 @@ def preform_move(state:State, dest_location, IsMyTurn) -> State:
     turn = state.turn
     penalty = state.fine_score
     fruits = state.fruits
-    new_state = State()
     if IsMyTurn == True:
-
         state.turn + 1
         board[my_location[0]][my_location[1]] = -1
+        if board[dest_location[0]][dest_location[1]] > 2:
+            my_score += board[dest_location[0]][dest_location[1]]
+        board[dest_location[0]][dest_location[1]] = 1
         my_location = dest_location
     else:
         board[rival_loaction[0]][rival_loaction[1]] = -1
         rival_loaction = dest_location
-    new_state = State(board, penalty, my_score, rival_score, fruits, turn)
+        if board[dest_location[0]][dest_location[1]] > 2:
+            rival_score += board[dest_location[0]][dest_location[1]]
+        board[dest_location[0]][dest_location[1]] = 2
 
+    if can_I_move(board, my_location) == False:
+        my_score -= penalty
+    if can_I_move(board, rival_loaction) == False:
+        rival_score -= penalty
+    new_state = State(board, penalty, my_score, rival_score, fruits, turn)
+    return new_state
 
 def calc_score(state, player_type):
     if not can_I_move(state.board, state.my_location):
