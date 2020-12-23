@@ -19,8 +19,14 @@ class Player(AbstractPlayer):
             - board: np.array, a 2D matrix of the board.
         No output is expected.
         """
-        #TODO: erase the following line and implement this function.
-        raise NotImplementedError
+        self.cur_fruits = None
+        self.board = board
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if board[i][j] == 1:
+                    self.self_pos = (i, j)
+                if board[i][j] == 2:
+                    self.enemy_pos = (i, j)
     
 
     def make_move(self, time_limit, players_score):
@@ -40,8 +46,9 @@ class Player(AbstractPlayer):
             - pos: tuple, the new position of the rival.
         No output is expected
         """
-        #TODO: erase the following line and implement this function.
-        raise NotImplementedError
+        self.board[self.enemy_pos[0]][self.enemy_pos[1]] = -1
+        self.board[pos[0]][pos[1]] = 2
+        self.enemy_pos = pos
 
 
     def update_fruits(self, fruits_on_board_dict):
@@ -52,9 +59,16 @@ class Player(AbstractPlayer):
                                     'value' is the value of this fruit.
         No output is expected.
         """
-        #TODO: erase the following line and implement this function. In case you choose not to use this function, 
-        # use 'pass' instead of the following line.
-        raise NotImplementedError
+        new_fruit_positions = fruits_on_board_dict.keys()
+        if self.cur_fruits is not None:
+            for pos in self.cur_fruits.keys():  # Remove old fruits
+                if pos not in new_fruit_positions and self.board[pos[0]][pos[1]] not in [-1, 1, 2]:
+                    self.board[pos[0]][pos[1]] = 0
+
+        for pos, val in fruits_on_board_dict.items():  # Update new fruits
+            if self.board[pos[0]][pos[1]] not in [-1, 1, 2]:
+                self.board[pos[0]][pos[1]] = val
+        self.cur_fruits = fruits_on_board_dict
 
 
     ########## helper functions in class ##########

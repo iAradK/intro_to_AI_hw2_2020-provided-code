@@ -113,9 +113,6 @@ class Player(AbstractPlayer):
             if self.board[pos[0]][pos[1]] not in [-1, 1, 2]:
                 self.board[pos[0]][pos[1]] = val
         self.cur_fruits = fruits_on_board_dict
-    ########## helper functions in class ##########
-    #TODO: add here helper functions in class, if needed
-
 
     ########## helper functions for MiniMax algorithm ##########
     #TODO: add here the utility, succ, and perform_move functions used in MiniMax algorithm

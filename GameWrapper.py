@@ -6,7 +6,7 @@ import sys
 class GameWrapper:
     def __init__(self, size, block_positions, starts, player_1, player_2, 
                 terminal_viz, print_game_in_terminal, 
-                time_to_make_a_move=2, game_time=100, 
+                time_to_make_a_move=200, game_time=100,
                 penalty_score=300, max_fruit_score=300, max_fruit_time=15):
         """Initialize the game wrapper and the initial board state with parameters.
         input:
@@ -34,6 +34,7 @@ class GameWrapper:
         self.print_game_in_terminal = print_game_in_terminal
         self.terminal_viz = terminal_viz
         self.time_to_make_a_move = time_to_make_a_move
+        #self.time_to_make_a_move = 5 , add
         self.penalty_score = penalty_score
         self.some_player_cant_move = False
         
@@ -82,13 +83,14 @@ class GameWrapper:
         if player_index:
             players_score.reverse()
         start = time.time()
-        move = self.players[player_index].make_move(self.time_to_make_a_move, players_score)
+        move = self.players[player_index].make_move(2, players_score) #return to 200
         end = time.time()
         time_diff = end - start
 
         # reduce time from global time
         self.game_time_left_for_players[player_index] -= time_diff
 
+        print("time: ", time_diff, " Allowed: ", self.time_to_make_a_move)
         if time_diff > self.time_to_make_a_move or self.game_time_left_for_players[player_index] <= 0:
             self.game.penalize_player(player_index, self.penalty_score)
             player_index_time_up = player_index+1

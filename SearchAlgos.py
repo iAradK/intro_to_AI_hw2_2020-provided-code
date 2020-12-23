@@ -245,5 +245,59 @@ class AlphaBeta(SearchAlgos):
         :param: beta: beta value
         :return: A tuple: (The min max algorithm value, The direction in case of max node or None in min mode)
         """
-        # TODO: erase the following line and implement this function.
-        raise NotImplementedError
+        if maximizing_player is True:  # my turn
+            location = state.my_location
+        else:
+            location = state.rival_location
+        if location is None:
+            print("WTF?!?!", state.board)
+            exit()
+        if can_I_move(state.board, location) is False or depth == 0\
+                or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
+            if can_I_win_with_fine(state, maximizing_player): # We want to make it worth to get the fine
+                if maximizing_player is True:
+                    state.my_score += 10000
+                else:
+                    state.rival_score += 10000
+            return (calc_score(state, 1), (1,1))
+        fruit_vanish = min(len(state.board), len(state.board[0]))
+        if state.turn == fruit_vanish:
+            remove_fruits_from_board(state.board)
+        if maximizing_player is True:
+            max_val = -1000000
+            best_direction = None
+            for child in get_legal_moves(state.board, location):
+                score_to_add = 0
+                fruits = state.fruits.copy()
+                if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
+                    del fruits[child]
+                    score_to_add += state.board[child[0]][child[1]]
+                tmp_board = state.board.copy()
+                tmp_board[state.my_location[0]][state.my_location[1]] = -1  # Update old location
+                tmp_board[child[0]][child[1]] = 1  # Update new location
+                new_state = State(tmp_board, state.fine_score, state.my_score + score_to_add, state.rival_score,
+                                  fruits, state.turn + 1)
+                (val, _) = self.search(new_state, depth - 1, False)
+                if max_val < val:
+                    best_direction = calc_direction(location, child)
+                    max_val = val
+            return (max_val, best_direction)
+        else:
+            min_val = 1000000
+            best_direction = None
+            for child in get_legal_moves(state.board, location):
+                score_to_add = 0
+                fruits = state.fruits.copy()
+                if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
+                    score_to_add += state.board[child[0]][child[1]]
+                    del fruits[child]
+                tmp_board = state.board.copy()
+                tmp_board[state.rival_location[0]][state.rival_location[1]] = -1  # Update old location
+                tmp_board[child[0]][child[1]] = 2  # Update new location
+                new_state = State(tmp_board, state.fine_score, state.my_score, state.rival_score + score_to_add,
+                                  fruits, state.turn)
+                (val, _) = self.search(new_state, depth - 1, True)
+                if val < min_val:
+                    best_direction = calc_direction(location, child)
+                    min_val = val
+            return (min_val, best_direction)
