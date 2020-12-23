@@ -183,7 +183,7 @@ def get_heuristic_for_move(state, move, agent):
 
 
 def sorted_moves(state, agent):
-    if agent == 1:
+    if agent is True:
         moves = get_legal_moves(state.board, state.my_location)
     else:
         moves = get_legal_moves(state.board, state.rival_location)
@@ -209,8 +209,6 @@ class SearchAlgos:
 
 
 class MiniMax(SearchAlgos):
-
-
     def search(self, state: State, depth, maximizing_player):
         """Start the MiniMax algorithm.
         :param state: The state to start from.
