@@ -6,7 +6,8 @@ from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 
 from players.our_structurs import State
 
-def preform_move(state:State, dest_location, IsMyTurn) -> State:
+
+def preform_move(state: State, dest_location, IsMyTurn) -> State:
     board = state.board.copy()
     my_location = state.my_location
     rival_loaction = state.rival_location
@@ -35,6 +36,7 @@ def preform_move(state:State, dest_location, IsMyTurn) -> State:
         rival_score -= penalty
     new_state = State(board, penalty, my_score, rival_score, fruits, turn)
     return new_state
+
 
 def calc_score(state, player_type):
     if not can_I_move(state.board, state.my_location):
@@ -103,7 +105,7 @@ def find_fruits(state):
 def find_longest_route_aux(board, curr_pos, new_pos, depth):
     temp_board = board.copy()
     temp_board[curr_pos[0]][curr_pos[1]] = -1
-    if depth == 10:
+    if depth == 5:
         return 0
     max = 0
     if not can_I_move(temp_board, new_pos):
@@ -128,6 +130,7 @@ def just_get_any_legal_location(state: State):
     loc = get_legal_moves(state.board, state.my_location)[0]
     return calc_direction(state.my_location, loc)
 
+
 def heuristic_calc(state):
     heuristic = 0
     fruits = find_fruits(state)
@@ -148,6 +151,21 @@ def heuristic_calc(state):
         heuristic += min(find_longest_route(state), 5) * (state.fine_score / max_fruit)
         heuristic += max_fruit * (max_fruit / state.fine_score)
     return heuristic
+
+
+# returns the value of the closest fruit (manhattan distance)
+def heuristic_calc_light(state):
+    heuristic = 0
+    fruits = find_fruits(state)
+    fruit_time = min(len(state.board), len(state.board[1])) - state.turn
+    min_dist = 10000
+    score = 0
+    for key, value in list(fruits.items()):
+        if calc_dist(state.my_location, key) < min_dist:
+            min_dist = calc_dist(state.my_location, key)
+            score = state.fruits[key]
+    return score
+
 
 def get_legal_moves(board, location):
     legal_moves = []
@@ -171,24 +189,29 @@ def remove_fruits_from_board(board):
 def calc_direction(old_loc, new_loc):
     return (new_loc[0] - old_loc[0], new_loc[1] - old_loc[1])
 
+
 def can_I_win_with_fine(state: State, maximizing_player):
     if maximizing_player is True:
         return state.my_score - state.rival_score > state.fine_score
 
     return state.rival_score - state.my_score > state.fine_score
 
-def get_heuristic_for_move(state, move, agent):
-    value = heuristic_calc(preform_move(state, move, agent))
-    return value
+
+def get_heuristic_for_move(state, move, agent, heuristic_type):
+    if heuristic_type == 1:
+        return heuristic_calc_light(preform_move(state, move, agent))
+    else:
+        return heuristic_calc(preform_move(state, move, agent))
 
 
-def sorted_moves(state, agent):
+def sorted_moves(state, agent, heuristic_type):
     if agent is True:
         moves = get_legal_moves(state.board, state.my_location)
     else:
         moves = get_legal_moves(state.board, state.rival_location)
-    moves.sort(key= (lambda move: get_heuristic_for_move(state, move, agent)))
+    moves.sort(key=(lambda move: get_heuristic_for_move(state, move, agent, heuristic_type)))
     return moves
+
 
 class SearchAlgos:
     def __init__(self, utility, succ, perform_move, goal=None):
@@ -209,11 +232,12 @@ class SearchAlgos:
 
 
 class MiniMax(SearchAlgos):
-    def search(self, state: State, depth, maximizing_player):
+    def search(self, state: State, depth, maximizing_player, heuristic_type=0):
         """Start the MiniMax algorithm.
         :param state: The state to start from.
         :param depth: The maximum allowed depth for the algorithm.
         :param maximizing_player: Whether this is a max node (True) or a min node (False).
+        :param: heuristic_type: 0 is normal, 1 is light
         :return: A tuple: (The min max algorithm value, The direction in case of max node or None in min mode)
         """
         # TODO: erase the following line and implement this function.
@@ -227,13 +251,15 @@ class MiniMax(SearchAlgos):
             exit()
         if can_I_move(state.board, location) is False \
                 or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
-            if can_I_win_with_fine(state, maximizing_player): # We want to make it worth to get the fine
+            if can_I_win_with_fine(state, maximizing_player):  # We want to make it worth to get the fine
                 if maximizing_player is True:
                     state.my_score += 10000
                 else:
                     state.rival_score += 10000
-            return (calc_score(state, 1), (1,1))
+            return (calc_score(state, 1), (1, 1))
         if depth == 0:
+            if heuristic_type == 1:
+                return (heuristic_calc_light(state), None)
             return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
@@ -241,7 +267,7 @@ class MiniMax(SearchAlgos):
         if maximizing_player is True:
             max_val = -1000000
             best_direction = None
-            sorted_moves(state,0)
+            sorted_moves(state, 0, heuristic_type)
             for child in get_legal_moves(state.board, location):
                 score_to_add = 0
                 fruits = state.fruits.copy()
@@ -281,13 +307,14 @@ class MiniMax(SearchAlgos):
 
 class AlphaBeta(SearchAlgos):
 
-    def search(self, state, depth, maximizing_player, alpha=ALPHA_VALUE_INIT, beta=BETA_VALUE_INIT):
+    def search(self, state, depth, maximizing_player, alpha=ALPHA_VALUE_INIT, beta=BETA_VALUE_INIT, heuristic_type=0):
         """Start the AlphaBeta algorithm.
         :param state: The state to start from.
         :param depth: The maximum allowed depth for the algorithm.
         :param maximizing_player: Whether this is a max node (True) or a min node (False).
         :param alpha: alpha value
         :param: beta: beta value
+        :param: heuristic_type: 0 is normal, 1 is light
         :return: A tuple: (The min max algorithm value, The direction in case of max node or None in min mode)
         """
         if maximizing_player is True:  # my turn
@@ -297,15 +324,17 @@ class AlphaBeta(SearchAlgos):
         if location is None:
             print("WTF?!?!", state.board)
             exit()
-        if can_I_move(state.board, location) is False or depth == 0\
+        if can_I_move(state.board, location) is False or depth == 0 \
                 or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
-            if can_I_win_with_fine(state, maximizing_player): # We want to make it worth to get the fine
+            if can_I_win_with_fine(state, maximizing_player):  # We want to make it worth to get the fine
                 if maximizing_player is True:
                     state.my_score += 10000
                 else:
                     state.rival_score += 10000
             return (calc_score(state, 1), None)
         if depth == 0:
+            if heuristic_type == 1:
+                return (heuristic_calc_light(state), None)
             return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
@@ -313,7 +342,7 @@ class AlphaBeta(SearchAlgos):
         if maximizing_player is True:
             max_val = -1000000
             best_direction = None
-            for child in sorted_moves(state, True):
+            for child in sorted_moves(state, True, heuristic_type):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
@@ -332,7 +361,7 @@ class AlphaBeta(SearchAlgos):
         else:
             min_val = 1000000
             best_direction = None
-            for child in sorted_moves(state, False):
+            for child in sorted_moves(state, False, heuristic_type):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
