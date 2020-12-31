@@ -46,12 +46,11 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        time_limit = 2
+        time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
-
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
         if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
@@ -79,7 +78,6 @@ class Player(AbstractPlayer):
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
         self.turn += 1
-
         return minimax_ret[1]
 
     def set_rival_move(self, pos):

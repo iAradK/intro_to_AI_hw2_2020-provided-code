@@ -117,12 +117,18 @@ def find_longest_route_aux(board, curr_pos, new_pos, depth):
     return max
 
 
-def find_longest_route(state):
+def find_longest_route(state, isMe):
     max = 0
-    for d in get_legal_moves(state.board, state.my_location):
-        temp = find_longest_route_aux(state.board, state.my_location, d, 0)
-        if temp > max:
-            max = temp
+    if isMe == True:
+        for d in get_legal_moves(state.board, state.my_location):
+            temp = find_longest_route_aux(state.board, state.my_location, d, 0)
+            if temp > max:
+                max = temp
+    else:
+        for d in get_legal_moves(state.board, state.rival_location):
+            temp = find_longest_route_aux(state.board, state.rival_location, d, 0)
+            if temp > max:
+                max = temp
     return max
 
 
@@ -145,10 +151,14 @@ def heuristic_calc(state):
     for key, value in fruits.items():
         if state.fruits[key] > max_fruit:
             max_fruit = state.fruits[key]
+    # x = find_longest_route(state, True)
     if max_fruit == -1:
-        heuristic += min(find_longest_route(state), 10) * state.fine_score
+        heuristic += min(find_longest_route(state, True), 10) * (state.fine_score / 100)
+        heuristic -= min(find_longest_route(state, False), 10) * (state.fine_score / 200)
+        # print(x)
     else:
-        heuristic += min(find_longest_route(state), 5) * (state.fine_score / max_fruit)
+        heuristic += min(find_longest_route(state, True), 10) * (state.fine_score / max_fruit) * 2
+        heuristic -= min(find_longest_route(state, False), 10) * (state.fine_score / max_fruit) * 1/2
         heuristic += max_fruit * (max_fruit / state.fine_score)
     return heuristic
 
@@ -256,7 +266,7 @@ class MiniMax(SearchAlgos):
                     state.my_score += 10000
                 else:
                     state.rival_score += 10000
-            return (calc_score(state, 1), (1, 1))
+            return (calc_score(state, 1), None)
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)

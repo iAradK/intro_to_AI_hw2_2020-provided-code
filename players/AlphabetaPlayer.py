@@ -43,11 +43,14 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        time_limit = 3
+        time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
+
+        if self.turn == 0:
+            print(self.cur_fruits)
 
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
