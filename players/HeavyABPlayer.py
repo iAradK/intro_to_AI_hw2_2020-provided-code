@@ -46,15 +46,15 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        time_limit = 2
+        print('turn:', self.turn)
+        print(self.board)
+        print('--------------------------------------------')
+
+        # time_limit = 2
         start_time = time.time()
 
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
-        if players_score[0] - players_score[1] > self.penalty_score:  # If it is worthy to end the game
-            while time.time() - start_time < time_limit + 8:  # We want to get to fine, end the game and win
-                ret = just_get_any_legal_location(state)
-            return ret
 
         minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=3, maximizing_player=True)
 
@@ -62,7 +62,8 @@ class Player(AbstractPlayer):
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
         self.turn += 1
-
+        print(self.board)
+        print()
         return minimax_ret[1]
 
     def set_rival_move(self, pos):

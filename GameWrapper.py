@@ -83,7 +83,7 @@ class GameWrapper:
         if player_index:
             players_score.reverse()
         start = time.time()
-        move = self.players[player_index].make_move(200, players_score)
+        move = self.players[player_index].make_move(2, players_score) #return to 200
         end = time.time()
         time_diff = end - start
 
@@ -109,9 +109,8 @@ class GameWrapper:
         # print('player is at pos', prev_pos)
         pos = (prev_pos[0] + move[0], prev_pos[1] + move[1])
         print('Player', player_index + 1, 'moved to', pos)
-        if self.game.check_move(pos) is False:
-            print("WTF")
-            self.game.print_map()
+        if self.game.check_move(pos) == False:
+            print(self.game.map)
         assert self.game.check_move(pos), 'illegal move'
         self.players[1 - player_index].set_rival_move(pos)
 

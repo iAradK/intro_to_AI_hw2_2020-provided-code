@@ -93,7 +93,7 @@ def find_fruits(state):
     while open:
         cur = open.popleft()
         close.add(cur[0])
-        if cur[1] == 6:
+        if cur[1] == min(len(state.board), len(state.board[0])) - state.turn:
             continue
         for next in succ(state.board, close, cur[0], cur[1]):
             if state.board[next[0][0]][next[0][1]] > 2:
@@ -136,32 +136,40 @@ def just_get_any_legal_location(state: State):
     loc = get_legal_moves(state.board, state.my_location)[0]
     return calc_direction(state.my_location, loc)
 
+def calc_nearby_fruits(state, location):
+    score = 0
+    for key, value in state.fruits.items():
+        if calc_dist(location, key) <= 3:
+            score += value*0.1
+    return score
 
 def heuristic_calc(state):
     heuristic = 0
     fruits = find_fruits(state)
-    fruit_time = min(len(state.board), len(state.board[1])) - state.turn
-    for key, value in list(fruits.items()):
-        if value > fruit_time:
-            fruits.pop(key)
-            continue
-        if calc_dist(state.my_location, key) > calc_dist(state.rival_location, key):  # TODO: check if > or >=
-            fruits.pop(key)
-    max_fruit = -1
+    # fruit_time = min(len(state.board), len(state.board[1])) - state.turn
+    # for key, value in list(fruits.items()):
+    #     if value > fruit_time:
+    #         fruits.pop(key)
+    #         continue
+        # if calc_dist(state.my_location, key) > calc_dist(state.rival_location, key):  # TODO: check if > or >=
+        #     fruits.pop(key)
+    max_fruit = -100000000
     for key, value in fruits.items():
-        if state.fruits[key] > max_fruit:
-            max_fruit = state.fruits[key]
+        real_value = state.fruits[key] - 0.1*value*(state.fruits[key]) + calc_nearby_fruits(state, key)
+        if real_value > max_fruit:
+            max_fruit = real_value
     # x = find_longest_route(state, True)
-    if max_fruit == -1:
-        heuristic += min(find_longest_route(state, True), 10) * (state.fine_score / 100)
-        heuristic -= min(find_longest_route(state, False), 10) * (state.fine_score / 200)
+    if max_fruit == -100000000:
+        heuristic += find_longest_route(state, True) * (state.fine_score / 1)
+        heuristic -= find_longest_route(state, False) * (state.fine_score / 2)
         # print(x)
     else:
-        heuristic += min(find_longest_route(state, True), 10) * (state.fine_score / max_fruit) * 2
-        heuristic -= min(find_longest_route(state, False), 10) * (state.fine_score / max_fruit) * 1/2
-        heuristic += max_fruit * (max_fruit / state.fine_score)
+        if max_fruit == 0:
+            max_fruit = 1
+        heuristic += find_longest_route(state, True) * (state.fine_score / (max_fruit*3)) * 2
+        heuristic -= find_longest_route(state, False) * (state.fine_score / (max_fruit*6)) * 1/2
+        heuristic += real_value
     return heuristic
-
 
 # returns the value of the closest fruit (manhattan distance)
 def heuristic_calc_light(state):
@@ -334,13 +342,13 @@ class AlphaBeta(SearchAlgos):
         if location is None:
             print("WTF?!?!", state.board)
             exit()
-        if can_I_move(state.board, location) is False or depth == 0 \
-                or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
-            if can_I_win_with_fine(state, maximizing_player):  # We want to make it worth to get the fine
-                if maximizing_player is True:
-                    state.my_score += 10000
-                else:
-                    state.rival_score += 10000
+        if can_I_move(state.board, location) is False or depth == 0:
+               # or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth TODO:
+            # if can_I_win_with_fine(state, maximizing_player):  # We want to make it worth to get the fine
+            #     if maximizing_player is True:
+            #         state.my_score += 10000
+            #     else:
+            #         state.rival_score += 10000
             return (calc_score(state, 1), None)
         if depth == 0:
             if heuristic_type == 1:
