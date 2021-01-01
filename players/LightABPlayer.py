@@ -57,7 +57,7 @@ class Player(AbstractPlayer):
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
 
-        minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=3, maximizing_player=True, heuristic_type=1)
+        minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=2, maximizing_player=True, heuristic_type=1)
 
         new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
         self.board[state.my_location[0]][state.my_location[1]] = -1
