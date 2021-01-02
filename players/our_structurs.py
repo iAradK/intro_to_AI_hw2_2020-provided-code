@@ -7,7 +7,7 @@ class State:
         self.fine_score = fine_score
         self.my_score = my_score
         self.rival_score = rival_score
-        self.fruits = fruits
+        self.fruits = {}
         self.my_location = None
         self.rival_location = None
         self.turn = turn
@@ -15,5 +15,7 @@ class State:
             for j in range(len(board[i])):
                 if board[i][j] == 1:
                     self.my_location = (i, j)
-                if board[i][j] == 2:
+                elif board[i][j] == 2:
                     self.rival_location = (i, j)
+                elif board[i][j] > 2:
+                    self.fruits[(i, j)] = board[i][j]

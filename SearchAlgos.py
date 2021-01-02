@@ -185,6 +185,98 @@ def heuristic_calc_light(state):
     return score
 
 
+def heuristic1(state, isMe): # Uses manhattan distance for fruits
+    heuristic = 0
+    max_fruit = -100000000
+    for key, value in state.fruits:
+        if isMe is True:
+            location = state.my_location
+        else:
+            location= state.rival_location
+        real_value = state.fruits[key] - 0.1 * value * (calc_dist(key, location)) + calc_nearby_fruits(state, key)
+        if real_value > max_fruit:
+            max_fruit = real_value
+    if max_fruit == -100000000:
+        heuristic += find_longest_route(state, True) * (state.fine_score / 1)
+        heuristic -= find_longest_route(state, False) * (state.fine_score / 2)
+        # print(x)
+    else:
+        if max_fruit == 0:
+            max_fruit = 1
+        heuristic += find_longest_route(state, True) * (state.fine_score / (max_fruit * 3)) * 2
+        heuristic -= find_longest_route(state, False) * (state.fine_score / (max_fruit * 6)) * 1 / 2
+        heuristic += real_value
+    return heuristic
+
+
+def heuristic2(state, isMe):
+    heuristic = 0
+    max_fruit = -100000000
+    fruit_new_vals = {}
+    if isMe is True:
+        location = state.my_location
+    else:
+        location = state.rival_location
+    for key, value in state.fruits:
+        real_value = state.fruits[key] - 0.1 * value * (calc_dist(key, location)) + calc_nearby_fruits(state, key)
+        fruit_new_vals[key] = real_value
+
+    fruit_val = 0
+    for key, val in fruit_new_vals: # Calc value of location, not only the best fruit near by
+        fruit_val += 0.5 * val * (calc_dist(key, location))
+
+    if max_fruit == -100000000:
+        heuristic += find_longest_route(state, True) * (state.fine_score / 1)
+        heuristic -= find_longest_route(state, False) * (state.fine_score / 2)
+        # print(x)
+    else:
+        if max_fruit == 0:
+            max_fruit = 1
+        heuristic += find_longest_route(state, True) * (state.fine_score / (max_fruit * 3)) * 2
+        heuristic -= find_longest_route(state, False) * (state.fine_score / (max_fruit * 6)) * 1 / 2
+        heuristic += fruit_val
+    return heuristic
+
+
+def heuristic3(state):
+    fruits = find_fruits(state)
+    fruit_time = min(len(state.board), len(state.board[1])) - state.turn
+    min_dist = 10000
+    score = 0
+    for key, value in list(fruits.items()):
+        if calc_dist(state.my_location, key) < min_dist:
+            min_dist = calc_dist(state.my_location, key)
+            score = state.fruits[key]
+    rival_dist = calc_dist(state.my_location, state.rival_location)
+
+    if can_I_move(state.board, state.my_location):
+        return score - state.fine_score
+    return score + 0.2*rival_dist
+
+
+def heuristic4(state, isMe):
+    heuristic = 0
+    max_fruit = -100000000
+    fruit_new_vals = {}
+    if isMe is True:
+        location = state.my_location
+    else:
+        location = state.rival_location
+    for key, value in state.fruits:
+        real_value = state.fruits[key] - 0.1 * value * (calc_dist(key, location)) + calc_nearby_fruits(state, key)
+        fruit_new_vals[key] = real_value
+
+    fruit_val = 0
+    for key, val in fruit_new_vals: # Calc value of location, not only the best fruit near by
+        fruit_val += 0.5 * val * (calc_dist(key, location))
+
+    rival_dist = calc_dist(state.my_location, state.rival_location)
+
+    if can_I_move(state.board, state.my_location):
+        return fruit_val - state.fine_score
+    return fruit_val + 0.2*rival_dist
+
+
 def get_legal_moves(board, location):
     legal_moves = []
     for d in get_directions():
