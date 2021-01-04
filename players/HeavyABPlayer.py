@@ -46,9 +46,7 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        #print('turn:', self.turn)
-        #print(self.board)
-        print('--------------------------------------------')
+
 
         # time_limit = 2
         start_time = time.time()
@@ -56,14 +54,12 @@ class Player(AbstractPlayer):
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
 
-        minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=2, maximizing_player=True, heuristic_type=44)
+        minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=4, maximizing_player=True)
 
         new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
         self.turn += 1
-        #print(self.board)
-        #print()
         return minimax_ret[1]
 
     def set_rival_move(self, pos):
