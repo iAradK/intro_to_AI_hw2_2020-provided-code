@@ -315,6 +315,8 @@ def can_I_win_with_fine(state: State, maximizing_player):
 
 
 def get_heuristic_for_move(state, move, agent, heuristic_type):
+    if heuristic_type == 0:
+        return heuristic_calc(state)
     if heuristic_type == 1:
         return heuristic_calc_light(preform_move(state, move, agent))
     elif heuristic_type == 11:
@@ -332,6 +334,7 @@ def sorted_moves(state, agent, heuristic_type):
     else:
         moves = get_legal_moves(state.board, state.rival_location)
     #Change here?
+    print("A")
     moves.sort(key=(lambda move: get_heuristic_for_move(state, move, agent, heuristic_type)))
     return moves
 
@@ -354,8 +357,10 @@ class SearchAlgos:
         pass
 
 def choose_heuristic(state, heuristic_type, isMe):
-    if heuristic_type == 1:
+    if heuristic_type == 0:
         return heuristic_calc(state)
+    if heuristic_type == 1:
+        return heuristic_calc_light(state)
     elif heuristic_type == 11:
         return heuristic1(state, isMe)
     elif heuristic_type == 22:
