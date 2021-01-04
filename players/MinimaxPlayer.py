@@ -59,7 +59,7 @@ class Player(AbstractPlayer):
 
         if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
-            print("AAAA")
+            #print("AAAA")
             while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
                 # minimax_ret = MiniMax(succ=succ,utility=utility, perform_move= preform_move).search(state=state, depth=depth, maximizing_player=True)
                 minimax_ret = self.get_legal_moves(state.board, state.my_location)[0]

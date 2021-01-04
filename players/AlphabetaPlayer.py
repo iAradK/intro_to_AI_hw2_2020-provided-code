@@ -45,29 +45,24 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
         depth = 1
 
-        if self.turn == 0:
-            print(self.cur_fruits)
-
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
         if players_score[0] - players_score[1] > self.penalty_score:  # If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
+            print("AAAA")
             while time.time() - start_time < time_limit + 8:  # We want to get to fine, end the game and win
-                minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=depth, maximizing_player=True)
-                # print('depth        ', depth)
-                depth += 1
+                minimax_ret = self.get_legal_moves(state.board, state.my_location)[0]
+                minimax_ret = (0, self.calc_direction(state.my_location, minimax_ret))
 
             new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
             self.board[state.my_location[0]][state.my_location[1]] = -1
             self.board[new_pos[0]][new_pos[1]] = 1
             self.turn += 1
-
             return minimax_ret[1]
 
         # TODO: check if correct upperbound
@@ -287,11 +282,32 @@ class Player(AbstractPlayer):
             return state.my_score - state.rival_score > state.fine_score
         return state.rival_score - state.my_score > state.fine_score
 
-    def get_heuristic_for_move(self, state, move, agent, heuristic_type):
-        if heuristic_type == 0:
-            return self.heuristic_calc(state, agent)
-        if heuristic_type == 1:
-            return self.heuristic_calc_light(self.preform_move(state, move, agent))
+    def heuristic_calc(self, state, isMe):
+        heuristic = 0
+        max_fruit = -100000000
+        for key, value in state.fruits.items():
+            if isMe is True:
+                location = state.my_location
+            else:
+                location = state.rival_location
+            real_value = state.fruits[key] - 0.1 * value * (self.calc_dist(key, location)) + \
+                         self.calc_nearby_fruits(state, key)
+            if real_value > max_fruit:
+                max_fruit = real_value
+        if max_fruit == -100000000:
+            heuristic += self.find_longest_route(state, True) * (state.fine_score / 1)
+            heuristic -= self.find_longest_route(state, False) * (state.fine_score / 2)
+            # print(x)
+        else:
+            if max_fruit == 0:
+                max_fruit = 1
+            heuristic += self.find_longest_route(state, True) * (state.fine_score / (max_fruit * 3)) * 2
+            heuristic -= self.find_longest_route(state, False) * (state.fine_score / (max_fruit * 6)) * 1 / 2
+            heuristic += real_value
+        return heuristic
+
+    def get_heuristic_for_move(self, state, move, agent):
+        return self.heuristic_calc(self.preform_move(state, move, agent), agent)
 
     def sorted_moves(self, state, agent, heuristic_type):
         if agent is True:
@@ -299,5 +315,5 @@ class Player(AbstractPlayer):
         else:
             moves = get_legal_moves(state.board, state.rival_location)
         # Change here?
-        moves.sort(key=(lambda move: self.get_heuristic_for_move(state, move, agent, heuristic_type)))
+        moves.sort(key=(lambda move: self.get_heuristic_for_move(state, move, agent)))
         return moves
