@@ -88,6 +88,7 @@ class GameWrapper:
         # reduce time from global time
         self.game_time_left_for_players[player_index] -= time_diff
 
+        print("Time: ", time_diff)
         if time_diff > self.time_to_make_a_move or self.game_time_left_for_players[player_index] <= 0:
             self.game.penalize_player(player_index, self.penalty_score)
             player_index_time_up = player_index + 1

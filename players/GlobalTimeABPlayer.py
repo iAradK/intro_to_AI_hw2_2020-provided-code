@@ -74,7 +74,7 @@ class Player(AbstractPlayer):
             return minimax_ret[1]
 
         # TODO: check if correct upperbound
-        while 5 * iteration_time + 1 < time_limit and time.time() - start_time < time_per_turn:  # total time = iter_time + 3*iter_time (the upper bound of the running time)
+        while 4 * iteration_time + 0.5 < time_limit - (time.time() - start_time) and time.time() - start_time < time_per_turn:  # total time = iter_time + 3*iter_time (the upper bound of the running time)
             moves = get_legal_moves(state.board, state.my_location)
             minimax_ret = [1, 2]
             if len(moves) == 1:
