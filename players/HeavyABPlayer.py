@@ -51,7 +51,7 @@ class Player(AbstractPlayer):
         # time_limit = 2
         start_time = time.time()
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
-        succ = self.get_legal_moves
+        succ = self.sorted_moves
         utility = self.calc_score
         preform_move = self.preform_move
 
@@ -306,3 +306,8 @@ class Player(AbstractPlayer):
         # Change here?
         moves.sort(key=(lambda move: self.get_heuristic_for_move(state, move, agent, heuristic_type)))
         return moves
+
+    def get_directions(self):
+        """Returns all the possible directions of a player in the game as a list of tuples.
+        """
+        return [(1, 0), (0, 1), (-1, 0), (0, -1)]
