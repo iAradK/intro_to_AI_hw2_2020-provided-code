@@ -38,13 +38,6 @@ def preform_move(state: State, dest_location, IsMyTurn) -> State:
     return new_state
 
 
-def calc_score(state, player_type):
-    if not can_I_move(state.board, state.my_location):
-        state.my_score -= state.fine_score
-    if not can_I_move(state.board, state.rival_location):
-        state.rival_score -= state.fine_score
-    return state.my_score - state.rival_score
-
 
 def can_I_move(board, pos):
     num_steps_available = 0
@@ -273,7 +266,7 @@ class MiniMax(SearchAlgos):
                     state.my_score += 10000
                 else:
                     state.rival_score += 10000
-            return (calc_score(state, 1), None)
+            return (self.utility(state, 1), None)
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)
@@ -285,7 +278,7 @@ class MiniMax(SearchAlgos):
             max_val = -1000000
             best_direction = None
             sorted_moves(state, 0, heuristic_type)
-            for child in get_legal_moves(state.board, location):
+            for child in self.succ(state.board, location):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
@@ -304,7 +297,7 @@ class MiniMax(SearchAlgos):
         else:
             min_val = 1000000
             best_direction = None
-            for child in get_legal_moves(state.board, location):
+            for child in self.succ(state.board, location):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
@@ -347,7 +340,7 @@ class AlphaBeta(SearchAlgos):
             #         state.my_score += 10000
             #     else:
             #         state.rival_score += 10000
-            return (calc_score(state, 1), None)
+            return (self.utility(state, 1), None)
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)
@@ -358,7 +351,7 @@ class AlphaBeta(SearchAlgos):
         if maximizing_player is True:
             max_val = -1000000
             best_direction = None
-            for child in sorted_moves(state, True, heuristic_type):
+            for child in self.succ(state, True, heuristic_type):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
@@ -374,10 +367,10 @@ class AlphaBeta(SearchAlgos):
                     best_direction = calc_direction(location, child)
                     max_val = val
             return (max_val, best_direction)
-        else: 
+        else:
             min_val = 1000000
             best_direction = None
-            for child in sorted_moves(state, False, heuristic_type):
+            for child in self.succ(state, False, heuristic_type):
                 score_to_add = 0
                 fruits = state.fruits.copy()
                 if state.board[child[0]][child[1]] > 2:  # if we are on a fruit
