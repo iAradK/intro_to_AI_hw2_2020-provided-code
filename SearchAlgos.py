@@ -378,6 +378,7 @@ class MiniMax(SearchAlgos):
             location = state.rival_location
         if location is None:
             print("WTF?!?!", state.board)
+            #print
             exit()
         if can_I_move(state.board, location) is False \
                 or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth
