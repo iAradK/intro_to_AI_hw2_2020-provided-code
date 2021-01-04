@@ -7,7 +7,7 @@ from players.AbstractPlayer import AbstractPlayer
 from SearchAlgos import AlphaBeta, get_legal_moves, calc_direction, just_get_any_legal_location
 from SearchAlgos import find_longest_route
 import time
-from players.our_structurs import State
+from utils import State
 
 
 # TODO: you can import more modules, if needed
@@ -48,7 +48,6 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        # time_limit = 2
         start_time = time.time()
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
         succ = self.sorted_moves

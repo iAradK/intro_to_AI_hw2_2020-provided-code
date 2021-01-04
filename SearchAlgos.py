@@ -4,7 +4,7 @@ import collections
 
 from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 
-from players.our_structurs import State
+from utils import State
 
 def preform_move(state: State, dest_location, IsMyTurn) -> State:
     board = state.board.copy()

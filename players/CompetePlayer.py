@@ -2,7 +2,7 @@
 MiniMax Player with AlphaBeta pruning and global time
 """
 from players.AbstractPlayer import AbstractPlayer
-from players.our_structurs import State
+from utils import State
 import players.AlphabetaPlayer
 import time
 from SearchAlgos import AlphaBeta, get_legal_moves, calc_direction, just_get_any_legal_location

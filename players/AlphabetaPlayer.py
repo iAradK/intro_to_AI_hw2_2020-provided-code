@@ -4,7 +4,7 @@ MiniMax Player with AlphaBeta pruning
 import collections
 
 from players.AbstractPlayer import AbstractPlayer
-from players.our_structurs import State
+from utils import State
 import time
 from SearchAlgos import AlphaBeta, get_legal_moves, calc_direction, just_get_any_legal_location
 
@@ -49,7 +49,6 @@ class Player(AbstractPlayer):
         minimax_ret = 0
         iteration_time = 0
         depth = 1
-
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
         if players_score[0] - players_score[1] > self.penalty_score:  # If it is worthy to end the game

@@ -6,7 +6,7 @@ from players.AbstractPlayer import AbstractPlayer
 from SearchAlgos import MiniMax, get_legal_moves, calc_direction, just_get_any_legal_location
 from SearchAlgos import find_longest_route
 import time
-from players.our_structurs import State
+from utils import State
 
 
 #TODO: you can import more modules, if needed
@@ -46,8 +46,6 @@ class Player(AbstractPlayer):
         output:
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
-        #TODO: erase the following line and implement this function.
-        #time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
@@ -59,7 +57,6 @@ class Player(AbstractPlayer):
 
         if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
-            #print("AAAA")
             while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
                 # minimax_ret = MiniMax(succ=succ,utility=utility, perform_move= preform_move).search(state=state, depth=depth, maximizing_player=True)
                 minimax_ret = self.get_legal_moves(state.board, state.my_location)[0]
@@ -72,6 +69,7 @@ class Player(AbstractPlayer):
             return minimax_ret[1]
 
         #TODO: check if correct upperbound
+
         while 4*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
             moves = get_legal_moves(state.board, state.my_location)
             minimax_ret = [1, 2]
