@@ -3,6 +3,7 @@ MiniMax Player with AlphaBeta pruning and global time
 """
 from players.AbstractPlayer import AbstractPlayer
 from players.our_structurs import State
+import players.AlphabetaPlayer
 import time
 from SearchAlgos import AlphaBeta, get_legal_moves, calc_direction, just_get_any_legal_location
 #TODO: you can import more modules, if needed
@@ -18,7 +19,8 @@ class Player(AbstractPlayer):
         self.total_time = game_time
         self.time_left = game_time
         self.time_tmp = game_time
-        self.player = AlphaBeta(None, None, None)
+        self.ab = players.AlphabetaPlayer.Player(game_time, penalty_score)
+        self.player = AlphaBeta(utility=self.ab.calc_score, succ=self.ab.sorted_moves, perform_move=self.ab.preform_move)
 
 
     def set_game_params(self, board):
@@ -59,11 +61,12 @@ class Player(AbstractPlayer):
 
         state = State(self.board, self.penalty_score, players_score[0], players_score[1], self.cur_fruits, self.turn)
 
-        if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
+        if players_score[0] - players_score[1] > self.penalty_score:  # If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
-            while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
-                minimax_ret = self.player.search(state=state, depth=depth, maximizing_player=True)
-                depth += 1
+            # print("AAAA")
+            while time.time() - start_time < time_limit + 8:  # We want to get to fine, end the game and win
+                minimax_ret = self.ab.get_legal_moves(state.board, state.my_location)[0]
+                minimax_ret = (0, self.ab.calc_direction(state.my_location, minimax_ret))
 
             new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
             self.board[state.my_location[0]][state.my_location[1]] = -1
