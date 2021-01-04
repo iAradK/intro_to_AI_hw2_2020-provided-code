@@ -2,7 +2,6 @@
 MiniMax Player
 """
 import collections
-
 from players.AbstractPlayer import AbstractPlayer
 from SearchAlgos import MiniMax, get_legal_moves, calc_direction, just_get_any_legal_location
 from SearchAlgos import find_longest_route
@@ -48,7 +47,7 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        time_limit = 5
+        #time_limit = 5
         start_time = time.time()
         minimax_ret = 0
         iteration_time = 0
@@ -60,9 +59,11 @@ class Player(AbstractPlayer):
 
         if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
+            print("AAAA")
             while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
-                minimax_ret = MiniMax(succ=succ,utility=utility, perform_move= preform_move).search(state=state, depth=depth, maximizing_player=True)
-                depth += 1
+                # minimax_ret = MiniMax(succ=succ,utility=utility, perform_move= preform_move).search(state=state, depth=depth, maximizing_player=True)
+                minimax_ret = self.get_legal_moves(state.board, state.my_location)[0]
+                minimax_ret = (0, self.calc_direction(state.my_location, minimax_ret))
 
             new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
             self.board[state.my_location[0]][state.my_location[1]] = -1
@@ -125,6 +126,11 @@ class Player(AbstractPlayer):
 
     ########## helper functions for MiniMax algorithm ##########
     #TODO: add here the utility, succ, and perform_move functions used in MiniMax algorithm
+
+    def get_directions(self):
+        """Returns all the possible directions of a player in the game as a list of tuples.
+        """
+        return [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
     def preform_move(self,state: State, dest_location, IsMyTurn) -> State:
         board = state.board.copy()

@@ -160,6 +160,11 @@ class Player(AbstractPlayer):
         new_state = State(board, penalty, my_score, rival_score, fruits, turn)
         return new_state
 
+    def get_directions(self):
+        """Returns all the possible directions of a player in the game as a list of tuples.
+        """
+        return [(1, 0), (0, 1), (-1, 0), (0, -1)]
+
     def calc_score(self, state, player_type):
         if not self.can_I_move(state.board, state.my_location):
             state.my_score -= state.fine_score
