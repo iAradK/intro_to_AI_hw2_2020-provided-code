@@ -54,7 +54,7 @@ class Player(AbstractPlayer):
         """
         #TODO: erase the following line and implement this function. In case you choose not to use this function, 
         # use 'pass' instead of the following line.
-        raise NotImplementedError
+
 
 
     ########## helper functions in class ##########
