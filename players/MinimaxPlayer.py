@@ -56,8 +56,14 @@ class Player(AbstractPlayer):
         if players_score[0] - players_score[1] > self.penalty_score: #If it is worthy to end the game
             # print("Yessss, ", players_score[0], " ", players_score[1], " ", self.penalty_score)
             while time.time() - start_time < time_limit + 8:# We want to get to fine, end the game and win
-                ret = just_get_any_legal_location(state)
-            return ret
+                minimax_ret = MiniMax(None, None, None).search(state=state, depth=depth, maximizing_player=True)
+                depth += 1
+
+            new_pos = (state.my_location[0] + minimax_ret[1][0], state.my_location[1] + minimax_ret[1][1])
+            self.board[state.my_location[0]][state.my_location[1]] = -1
+            self.board[new_pos[0]][new_pos[1]] = 1
+            self.turn += 1
+            return minimax_ret[1]
 
         #TODO: check if correct upperbound
         while 4*iteration_time < time_limit and time.time() - start_time < time_limit:  #total time = iter_time + 3*iter_time (the upper bound of the running time)
