@@ -328,13 +328,13 @@ class AlphaBeta(SearchAlgos):
         if location is None:
             print("WTF?!?!", state.board)
             exit()
-        if can_I_move(state.board, location) is False or depth == 0:
-               # or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth TODO:
-            # if can_I_win_with_fine(state, maximizing_player):  # We want to make it worth to get the fine
-            #     if maximizing_player is True:
-            #         state.my_score += 10000
-            #     else:
-            #         state.rival_score += 10000
+        if can_I_move(state.board, location) is False or depth == 0 \
+                or can_I_win_with_fine(state, maximizing_player):  # is goal state or at end of depth TODO:
+            if can_I_win_with_fine(state, maximizing_player):  # We want to make it worth to get the fine
+                if maximizing_player is True:
+                    state.my_score += 10000
+                else:
+                    state.rival_score += 10000
             return (self.utility(state, 1), None)
         if depth == 0:
             if heuristic_type == 1:
