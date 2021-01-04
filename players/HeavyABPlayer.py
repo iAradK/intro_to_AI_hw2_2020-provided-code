@@ -46,8 +46,8 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         # TODO: erase the following line and implement this function.
-        print('turn:', self.turn)
-        print(self.board)
+        #print('turn:', self.turn)
+        #print(self.board)
         print('--------------------------------------------')
 
         # time_limit = 2
@@ -62,8 +62,8 @@ class Player(AbstractPlayer):
         self.board[state.my_location[0]][state.my_location[1]] = -1
         self.board[new_pos[0]][new_pos[1]] = 1
         self.turn += 1
-        print(self.board)
-        print()
+        #print(self.board)
+        #print()
         return minimax_ret[1]
 
     def set_rival_move(self, pos):

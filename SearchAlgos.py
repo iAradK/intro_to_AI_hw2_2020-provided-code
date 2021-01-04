@@ -334,7 +334,6 @@ def sorted_moves(state, agent, heuristic_type):
     else:
         moves = get_legal_moves(state.board, state.rival_location)
     #Change here?
-    print("A")
     moves.sort(key=(lambda move: get_heuristic_for_move(state, move, agent, heuristic_type)))
     return moves
 
@@ -401,7 +400,7 @@ class MiniMax(SearchAlgos):
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)
-            return choose_heuristic(state, heuristic_type, True)
+            return (choose_heuristic(state, heuristic_type, True), None)
             # return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
@@ -476,7 +475,7 @@ class AlphaBeta(SearchAlgos):
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)
-            return choose_heuristic(state, heuristic_type, True)
+            return (choose_heuristic(state, heuristic_type, True), None)
             # return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
