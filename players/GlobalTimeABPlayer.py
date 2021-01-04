@@ -49,7 +49,6 @@ class Player(AbstractPlayer):
             - direction: tuple, specifing the Player's movement, chosen from self.directions
         """
         #TODO: erase the following line and implement this function.
-        time_limit = 5
         have_same_time = min(len(self.board), len(self.board[0])) / 2
         time_per_turn = self.time_tmp*2 // (3 * have_same_time)
         print("Turn ", self.turn, " time: ", time_per_turn)
@@ -75,7 +74,7 @@ class Player(AbstractPlayer):
             return minimax_ret[1]
 
         # TODO: check if correct upperbound
-        while 4 * iteration_time < time_limit and time.time() - start_time < time_per_turn:  # total time = iter_time + 3*iter_time (the upper bound of the running time)
+        while 5 * iteration_time + 1 < time_limit and time.time() - start_time < time_per_turn:  # total time = iter_time + 3*iter_time (the upper bound of the running time)
             moves = get_legal_moves(state.board, state.my_location)
             minimax_ret = [1, 2]
             if len(moves) == 1:
