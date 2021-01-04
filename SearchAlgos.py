@@ -238,15 +238,22 @@ def heuristic2(state, isMe):
     return heuristic
 
 
-def heuristic3(state):
+def heuristic3(state, isMe):
     fruits = find_fruits(state)
     fruit_time = min(len(state.board), len(state.board[1])) - state.turn
     min_dist = 10000
     score = 0
+    if isMe is True:
+        location = state.my_location
+    else:
+        location = state.rival_location
+
     for key, value in list(fruits.items()):
-        if calc_dist(state.my_location, key) < min_dist:
-            min_dist = calc_dist(state.my_location, key)
+        dist = calc_dist(location, key)
+        if dist < min_dist:
+            min_dist = dist
             score = state.fruits[key]
+
     rival_dist = calc_dist(state.my_location, state.rival_location)
 
     if can_I_move(state.board, state.my_location):
@@ -319,6 +326,7 @@ def sorted_moves(state, agent, heuristic_type):
         moves = get_legal_moves(state.board, state.my_location)
     else:
         moves = get_legal_moves(state.board, state.rival_location)
+    #Change here?
     moves.sort(key=(lambda move: get_heuristic_for_move(state, move, agent, heuristic_type)))
     return moves
 
@@ -339,6 +347,18 @@ class SearchAlgos:
 
     def search(self, state, depth, maximizing_player):
         pass
+
+def choose_heuristic(state, heuristic_type, isMe):
+    if heuristic_type == 1:
+        return heuristic_calc(state)
+    elif heuristic_type == 11:
+        return heuristic1(state, isMe)
+    elif heuristic_type == 22:
+        return heuristic2(state, isMe)
+    elif heuristic_type == 33:
+        return heuristic3(state, isMe)
+    elif heuristic_type == 44:
+        return heuristic4(state, isMe)
 
 
 class MiniMax(SearchAlgos):
@@ -370,7 +390,8 @@ class MiniMax(SearchAlgos):
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)
-            return (heuristic_calc(state), None)
+            return choose_heuristic(state, heuristic_type, True)
+            # return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)
@@ -416,7 +437,6 @@ class MiniMax(SearchAlgos):
 
 
 class AlphaBeta(SearchAlgos):
-
     def search(self, state, depth, maximizing_player, alpha=ALPHA_VALUE_INIT, beta=BETA_VALUE_INIT, heuristic_type=0):
         """Start the AlphaBeta algorithm.
         :param state: The state to start from.
@@ -445,7 +465,8 @@ class AlphaBeta(SearchAlgos):
         if depth == 0:
             if heuristic_type == 1:
                 return (heuristic_calc_light(state), None)
-            return (heuristic_calc(state), None)
+            return choose_heuristic(state, heuristic_type, True)
+            # return (heuristic_calc(state), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)
@@ -468,7 +489,7 @@ class AlphaBeta(SearchAlgos):
                     best_direction = calc_direction(location, child)
                     max_val = val
             return (max_val, best_direction)
-        else:
+        else: 
             min_val = 1000000
             best_direction = None
             for child in sorted_moves(state, False, heuristic_type):
