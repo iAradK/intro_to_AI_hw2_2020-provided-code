@@ -6,7 +6,6 @@ from utils import ALPHA_VALUE_INIT, BETA_VALUE_INIT, get_directions
 
 from players.our_structurs import State
 
-
 def preform_move(state: State, dest_location, IsMyTurn) -> State:
     board = state.board.copy()
     my_location = state.my_location
@@ -36,8 +35,6 @@ def preform_move(state: State, dest_location, IsMyTurn) -> State:
         rival_score -= penalty
     new_state = State(board, penalty, my_score, rival_score, fruits, turn)
     return new_state
-
-
 
 def can_I_move(board, pos):
     num_steps_available = 0
@@ -268,9 +265,7 @@ class MiniMax(SearchAlgos):
                     state.rival_score += 10000
             return (self.utility(state, 1), None)
         if depth == 0:
-            if heuristic_type == 1:
-                return (heuristic_calc_light(state), None)
-            return (heuristic_calc(state), None)
+            return (heuristic_calc(state, True), None)
         fruit_vanish = min(len(state.board), len(state.board[0]))
         if state.turn == fruit_vanish:
             remove_fruits_from_board(state.board)

@@ -1,6 +1,8 @@
 """
 MiniMax Player with AlphaBeta pruning
 """
+import collections
+
 from players.AbstractPlayer import AbstractPlayer
 from players.our_structurs import State
 import time
@@ -69,6 +71,9 @@ class Player(AbstractPlayer):
             return minimax_ret[1]
 
         # TODO: check if correct upperbound
+        succ = self.sorted_moves
+        utility = self.calc_score
+        preform_move = self.preform_move
         while 4 * iteration_time < time_limit and time.time() - start_time < time_limit:  # total time = iter_time + 3*iter_time (the upper bound of the running time)
             moves = get_legal_moves(state.board, state.my_location)
             minimax_ret = [1, 2]
@@ -78,8 +83,9 @@ class Player(AbstractPlayer):
                 break
 
             start_iteration = time.time()
-            minimax_ret = AlphaBeta(None, None, None).search(state=state, depth=depth, maximizing_player=True)
-            # print('depth        ', depth)
+            minimax_ret = AlphaBeta(utility=utility, succ=succ, perform_move=preform_move).search(
+                state=state, depth=depth, maximizing_player=True)
+
             iteration_time = time.time() - start_iteration
             depth += 1
 
@@ -124,7 +130,7 @@ class Player(AbstractPlayer):
 
     ########## helper functions for AlphaBeta algorithm ##########
     # TODO: add here the utility, succ, and perform_move functions used in AlphaBeta algorithm
-    def preform_move(state: State, dest_location, IsMyTurn) -> State:
+    def preform_move(self, state: State, dest_location, IsMyTurn) -> State:
         board = state.board.copy()
         my_location = state.my_location
         rival_loaction = state.rival_location
@@ -147,23 +153,28 @@ class Player(AbstractPlayer):
                 rival_score += board[dest_location[0]][dest_location[1]]
             board[dest_location[0]][dest_location[1]] = 2
 
-        if can_I_move(board, my_location) == False:
+        if self.can_I_move(board, my_location) == False:
             my_score -= penalty
-        if can_I_move(board, rival_loaction) == False:
+        if self.can_I_move(board, rival_loaction) == False:
             rival_score -= penalty
         new_state = State(board, penalty, my_score, rival_score, fruits, turn)
         return new_state
 
-    def calc_score(state, player_type):
-        if not can_I_move(state.board, state.my_location):
+    def get_directions(self):
+        """Returns all the possible directions of a player in the game as a list of tuples.
+        """
+        return [(1, 0), (0, 1), (-1, 0), (0, -1)]
+
+    def calc_score(self, state, player_type):
+        if not self.can_I_move(state.board, state.my_location):
             state.my_score -= state.fine_score
-        if not can_I_move(state.board, state.rival_location):
+        if not self.can_I_move(state.board, state.rival_location):
             state.rival_score -= state.fine_score
         return state.my_score - state.rival_score
 
-    def can_I_move(board, pos):
+    def can_I_move(self, board, pos):
         num_steps_available = 0
-        for d in get_directions():
+        for d in self.get_directions():
             i = pos[0] + d[0]
             j = pos[1] + d[1]
 
@@ -181,10 +192,10 @@ class Player(AbstractPlayer):
         #TODO: given a state and a move, returns the new state after the move
     """
 
-    def calc_dist(pos1, pos2):
+    def calc_dist(self, pos1, pos2):
         return abs(pos1[0] - pos2[0]) + abs(pos1[1] - pos2[1])
 
-    def succ(board, close, cur_pos, depth):
+    def succ(self, board, close, cur_pos, depth):
         states = set()
         if cur_pos is None:
             print('hi')
@@ -197,7 +208,7 @@ class Player(AbstractPlayer):
             states.add((new_pos, depth + 1))
         return states
 
-    def find_fruits(state):
+    def find_fruits(self, state):
         close, open = set(), collections.deque([(state.my_location, 0)])
         close.add(state.my_location)
         fruits = {}
@@ -206,56 +217,54 @@ class Player(AbstractPlayer):
             close.add(cur[0])
             if cur[1] == min(len(state.board), len(state.board[0])) - state.turn:
                 continue
-            for next in succ(state.board, close, cur[0], cur[1]):
+            for next in self.succ(state.board, close, cur[0], cur[1]):
                 if state.board[next[0][0]][next[0][1]] > 2:
                     fruits[next[0]] = next[1]
                 open.append(next)
         return fruits
 
-    def find_longest_route_aux(board, curr_pos, new_pos, depth):
+    def find_longest_route_aux(self, board, curr_pos, new_pos, depth):
         temp_board = board.copy()
         temp_board[curr_pos[0]][curr_pos[1]] = -1
         if depth == 5:
             return 0
         max = 0
-        if not can_I_move(temp_board, new_pos):
+        if not self.can_I_move(temp_board, new_pos):
             return 0
         for d in get_legal_moves(board, new_pos):
-            temp = 1 + find_longest_route_aux(temp_board, new_pos, d, depth + 1)
+            temp = 1 + self.find_longest_route_aux(temp_board, new_pos, d, depth + 1)
             if temp > max:
                 max = temp
         return max
 
-    def find_longest_route(state, isMe):
+    def find_longest_route(self, state, isMe):
         max = 0
         if isMe == True:
             for d in get_legal_moves(state.board, state.my_location):
-                temp = find_longest_route_aux(state.board, state.my_location, d, 0)
+                temp = self.find_longest_route_aux(state.board, state.my_location, d, 0)
                 if temp > max:
                     max = temp
         else:
             for d in get_legal_moves(state.board, state.rival_location):
-                temp = find_longest_route_aux(state.board, state.rival_location, d, 0)
+                temp = self.find_longest_route_aux(state.board, state.rival_location, d, 0)
                 if temp > max:
                     max = temp
         return max
 
-    def just_get_any_legal_location(state: State):
+    def just_get_any_legal_location(self, state: State):
         loc = get_legal_moves(state.board, state.my_location)[0]
         return calc_direction(state.my_location, loc)
 
-    def calc_nearby_fruits(state, location):
+    def calc_nearby_fruits(self, state, location):
         score = 0
         for key, value in state.fruits.items():
-            if calc_dist(location, key) <= 3:
+            if self.calc_dist(location, key) <= 3:
                 score += value * 0.1
         return score
 
-
-
-    def get_legal_moves(board, location):
+    def get_legal_moves(self, board, location):
         legal_moves = []
-        for d in get_directions():
+        for d in self.get_directions():
             i = location[0] + d[0]
             j = location[1] + d[1]
 
@@ -264,32 +273,31 @@ class Player(AbstractPlayer):
                 legal_moves.append((i, j))
         return legal_moves
 
-    def remove_fruits_from_board(board):
+    def remove_fruits_from_board(self, board):
         for i in range(len(board)):
             for j in range(len(board[i])):
                 if board[i][j] > 2:
                     board[i][j] = 0
 
-    def calc_direction(old_loc, new_loc):
+    def calc_direction(self, old_loc, new_loc):
         return (new_loc[0] - old_loc[0], new_loc[1] - old_loc[1])
 
-    def can_I_win_with_fine(state: State, maximizing_player):
+    def can_I_win_with_fine(self, state: State, maximizing_player):
         if maximizing_player is True:
             return state.my_score - state.rival_score > state.fine_score
-
         return state.rival_score - state.my_score > state.fine_score
 
-    def get_heuristic_for_move(state, move, agent, heuristic_type):
+    def get_heuristic_for_move(self, state, move, agent, heuristic_type):
         if heuristic_type == 0:
-            return heuristic_calc(state, agent)
+            return self.heuristic_calc(state, agent)
         if heuristic_type == 1:
-            return heuristic_calc_light(preform_move(state, move, agent))
+            return self.heuristic_calc_light(self.preform_move(state, move, agent))
 
-    def sorted_moves(state, agent, heuristic_type):
+    def sorted_moves(self, state, agent, heuristic_type):
         if agent is True:
             moves = get_legal_moves(state.board, state.my_location)
         else:
             moves = get_legal_moves(state.board, state.rival_location)
         # Change here?
-        moves.sort(key=(lambda move: get_heuristic_for_move(state, move, agent, heuristic_type)))
+        moves.sort(key=(lambda move: self.get_heuristic_for_move(state, move, agent, heuristic_type)))
         return moves
