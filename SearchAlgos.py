@@ -317,9 +317,14 @@ def can_I_win_with_fine(state: State, maximizing_player):
 def get_heuristic_for_move(state, move, agent, heuristic_type):
     if heuristic_type == 1:
         return heuristic_calc_light(preform_move(state, move, agent))
-    else:
+    elif heuristic_type == 11:
         return heuristic_calc(preform_move(state, move, agent))
-
+    elif heuristic_type == 22:
+        return heuristic2(preform_move(state, move, agent), agent)
+    elif heuristic_type == 33:
+        return heuristic3(preform_move(state, move, agent), agent)
+    elif heuristic_type == 44:
+        return heuristic4(preform_move(state, move, agent), agent)
 
 def sorted_moves(state, agent, heuristic_type):
     if agent is True:
